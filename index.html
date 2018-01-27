@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<title></title>
+		<link href='./css/main.css' rel='stylesheet'>
+		<script src='./js/3rd/underscore-min.js'></script>
+		<script src='./js/3rd/phaser.js'></script>
+		<script src='./js/menu.js'></script>
+		<!--<script src='./js/tetris.js'></script>-->
+		<script src='./js/grid.js'></script>
+		<script src='./js/main.js'></script>
+		<script src='./js/game.js'></script>
+	</head>
+	<body onload='init()'>
+		<div id='wrapper'>
+			<div id='game' class='over'></div>
+			<!--<div id='lamp-container'>-->
+				<!--<div id='lamp'>-->
+					<!--[><div class='hat-thingy'></div><]-->
+					<!--<div class='glass'>-->
+						<!--<div class='glass-inside'>-->
+							<!--<div class='boop blob'></div>-->
+							<!--<div class='boop blob'></div>-->
+							<!--<div class='boop blob'></div>-->
+							<!--<div class='boop blob'></div>-->
+							<!--<div class='boop blob'></div>-->
+							<!--<div class='boop blob'></div>-->
+							<!--<div class='boop blob'></div>-->
+							<!--<div class='boop blob-top'></div>-->
+							<!--<div class='boop blob-bottom'></div>-->
+						<!--</div>-->
+					<!--</div>-->
+					<!--[><div class='base-one'></div><]-->
+					<!--[><div class='base-butt'></div><]-->
+					<!--[><div class='shadow'></div><]-->
+					<!--[><div class='the-actual-shadow'></div><]-->
+				<!--</div>-->
+			<!--</div>-->
+			<div id='menu' class='over centered hidden'>
+				<p id='menu-top'>The more blocks you have, the harder it is to play...</p>
+				<header>Snake<span>triS</span></header>
+				<p>A co-op game for 2 players!</p>
+				<p id='press'>Press ENTER to start</p>
+				<!--<p id='made-by'>Created by <a href='https://ldjam.com/users/yngvarr/'>Yngvarr</a>, <a href='https://ldjam.com/users/komnotmr/'>komnotmr</a> and <a href='https://ldjam.com/users/dolorosso/'>Dolorosso</a></p>-->
+			</div>
+			<div id='tutor1' class='tutor over hidden centered'>
+				<table>
+				<tr class='rule'>
+					<td><img class='rule1' width="150" height="35" ></td>
+					<td><p class='tab'>Snake (Player 1) eats fruit to grow</p></td>
+				</tr>
+				<tr class="rule">
+					<td><img class='rule5' width="170" height="90"></td>
+					<td><p class='tab'>When a fruit reaches the floor, it roots and becomes unremovable (but still counts when a line scores)</p></td>
+				</tr>
+				<tr class='rule'>
+					<td><img class='rule2' width="150" height="75"></td>
+					<td><p class='tab'>Don't hit things with your head, Snake,
+						unless you want to fall apart into pieces</p></td>
+				</tr>
+				</table>
+				<p>Press ENTER to continue</p>
+			</div>
+			<div id='tutor2' class='tutor over hidden centered'>
+				<table>
+				<tr class='rule'>
+					<td><img class='rule3' width="80" height="145"></td>
+					<td><p class='tab'>Hitting Snake with Tetrimino (Player 2)
+						cuts it's tail </p></td>
+				</tr>
+				<tr class='rule'>
+					<td><img class='rule4' width="100" height="90"></td>
+					<td><p class='tab'>Player 1, use cursor keys to control Snake</p>
+					<p>Player 2, you control Tetrimino with WASD.</p></td>
+				</tr>
+				</table>
+				<p>Your aim is to score as many points as you can. Have fun!</p>
+				<p>Press ENTER to start</p>
+			</div>
+			<div id='pause' class='over hidden'></div>
+			<div id='gameover' class='over centered hidden'>
+				<header>Game <span>Over</span></header>
+				<p id='score'>Your scored <span>...</span>!</p>
+				<p>Thank you for playing!</p>
+				<p>Don't forget to share your score and leave some feedback!</p>
+			</div>
+			</div>
+			<div id='hud' class='over hidden'><p style="float:left;">Score: </p><p id='hudscore'></p></div>
+		</div>
+	</body>
+</html>
