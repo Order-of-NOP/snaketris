@@ -95,7 +95,7 @@ class Grid {
 	 * @example
 	 * // coordinates are passed as [x, y]
 	 * grid.collide([[0,0], [0,1], [0,2], [1,2]]);
-	 * @param {list} li - list op points
+	 * @param {list} li - list of points
 	 * @return {list} A list of collisions. Collision is represented as a
 	 * tuple [cause, id], where id is the number of `li` member collided,
 	 * `cause` is a cause of collision (can be "wall", "ceil", "floor" or a
@@ -130,6 +130,12 @@ class Grid {
 		return res;
 	}
 	// set all the minos
+	/**
+	 * Sets a type of all the listed minos to the given one. Coordinates are
+	 * passed as [x,y].
+	 * @param {list} li - list of points
+	 * @param {number} type - [type]{@link MINO_TYPE} to set to
+	 */
 	set(li, type) {
 		if (typeof(type) !== 'number') {
 			console.warn(`${type} is not a number`);
