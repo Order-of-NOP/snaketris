@@ -1,5 +1,17 @@
 /* input.js */
 
+const DEFAULT_BINDS = [{
+	up: Phaser.KeyCode.UP,
+	down: Phaser.KeyCode.DOWN,
+	left: Phaser.KeyCode.LEFT,
+	right: Phaser.KeyCode.RIGHT
+}, {
+	up: Phaser.KeyCode.W,
+	down: Phaser.KeyCode.S,
+	left: Phaser.KeyCode.A,
+	right: Phaser.KeyCode.D
+}];
+
 /**
  * Input manager that doesn't mind to be used with pads. Translates controller
  * actions (e.g. KeyCode.W) into terms of gameplay actions (e.g. player1.jump).
@@ -15,12 +27,13 @@ class Input {
 		 * @member {list}
 		 */
 		this.p = [{}, {}];
+		// TODO set to a restore call
 		_.each(cursor, (key, idx) => {
 			this.p[0][idx] = new Key(game.input.keyboard, key.keyCode);
 		});
 		this.p[1] = {
-			//'up': new Key(game.input.keyboard, Phaser.KeyCode.W),
-			'up': new Key(game.input.gamepad.pad1, -1, 0),
+			'up': new Key(game.input.keyboard, Phaser.KeyCode.W),
+			//'up': new Key(game.input.gamepad.pad1, -1, 0),
 			'down': new Key(game.input.keyboard, Phaser.KeyCode.S),
 			'left': new Key(game.input.keyboard, Phaser.KeyCode.A),
 			'right': new Key(game.input.keyboard, Phaser.KeyCode.D)
@@ -60,7 +73,7 @@ class Input {
 			// set a key
 			this.p[player][key_name] = new Key(
 				game.input.keyboard,
-				game.input.keyboard.lastKey
+				game.input.keyboard.lastKey.keyCode
 			);
 			reset();
 		});
@@ -92,6 +105,60 @@ class Input {
 		ready = true;
 		console.log('Press a key.');
 	}
+	// TODO handle a memory shortage problem by removing bindings for devices
+	//      with lowest timestamp (update it every time someone uses given dev)
+	/** Saves current bindings into a localStorage. */
+	save() {
+		if (typeof(Storage) === 'undefined') {
+			console.warn("There is no Storage, so I can't save key bindings.");
+			return;
+		}
+		let ds = localStorage.ds || [];
+		let ks = [];
+		// reset before changing
+		localStorage.removeItem('ks');
+		for (let p = 0; p < this.p.length; ++p)
+		for (let a in this.p[p]) {
+			let key = this.p[p][a];
+			// defaults are not stored
+			if (
+				key.dev === game.input.keyboard
+				&& key.key.keyCode === DEFAULT_BINDS[p][a]
+			) continue;
+
+			// add an unknown device to devices list
+			if (
+				key.dev !== game.input.keyboard
+				//&& key.dev._rawPad
+				&& _.find(ds, (x) => {return x.id === key.dev._rawPad.id})
+					=== undefined
+			) {
+				// timestamp in minutes is needed to remove unused
+				// configurations when out of memory
+				ds.push({
+					'id': key.dev._rawPad.id,
+					't': Math.floor(Date.now() / 60000)
+				});
+			}
+
+			ks.push({
+				'p': p,
+				'a': a,
+				'd': key.dev === game.input.keyboard ?
+					-1 : _.findIndex(ds, (x) => {
+						return x.id === key.dev._rawPad.id;
+					}),
+				'k': key.keycode || key.key.keyCode,
+				'ax': key.axis
+			});
+		}
+		localStorage['ds'] = JSON.stringify(ds);
+		localStorage['ks'] = JSON.stringify(ks);
+	}
+	/** @todo load the layout from localStorage */
+	restore() {}
+	/** @todo remove the layout info from localStorage and restore defaults */
+	reset() {}
 }
 
 /**
@@ -136,6 +203,23 @@ class Key {
 			this.keycode = keycode;
 			this.key = null;
 			this.axis = axis === undefined ? null : axis;
+		}
+
+		// seems like SinglePad's default justReleased is a piece of crap
+		// so this is an alterantive representation that works as expected
+		if (this.dev !== game.input.keyboard && this.axis === null) {
+			this._butJR = false;
+			dev.addCallbacks(this, {
+				onUp: (btn, val) => {
+					if (btn !== this.keycode) return;
+					this._butJR = true;
+					let timer = game.time.create();
+					timer.add(250, () => {
+						this._butJR = false;
+					}, this);
+					timer.start();
+				}
+			});
 		}
 
 		// our brand new justReleased hack for axes
@@ -201,7 +285,12 @@ class Key {
 			this._axisJR = false;
 			return jr;
 		} else {
-			return this.dev.justReleased(this.keycode);
+			//return this.dev.justReleased(this.keycode);
+			let jr = this._butJR;
+			this._butJR = false;
+			return jr;
 		}
 	}
+	/** @todo return a string representation of a key */
+	show() {}
 }
