@@ -20,6 +20,9 @@ class Input {
 	/** To be called on game create. Uses Phaser's game.input objects. */
 	constructor() {
 		let cursor = game.input.keyboard.createCursorKeys();
+		if (this.pads_supported) {
+			game.input.gamepad.start();
+		}
 		/**
 		 * Action container for players. p[0] is for player one, p[1] - for
 		 * player 2, etc. Members contain hash-map with action names as keys
@@ -27,20 +30,17 @@ class Input {
 		 * @member {list}
 		 */
 		this.p = [{}, {}];
-		// TODO set to a restore call
-		_.each(cursor, (key, idx) => {
+		/*_.each(cursor, (key, idx) => {
 			this.p[0][idx] = new Key(game.input.keyboard, key.keyCode);
 		});
 		this.p[1] = {
 			'up': new Key(game.input.keyboard, Phaser.KeyCode.W),
-			//'up': new Key(game.input.gamepad.pad1, -1, 0),
 			'down': new Key(game.input.keyboard, Phaser.KeyCode.S),
 			'left': new Key(game.input.keyboard, Phaser.KeyCode.A),
 			'right': new Key(game.input.keyboard, Phaser.KeyCode.D)
-		};
-		if (this.pads_supported) {
-			game.input.gamepad.start();
-		}
+		};*/
+		// TODO do this when pad is connected
+		this.restore();
 	}
 	/**
 	 * Returns true when the browser supports gamepad input.
@@ -113,7 +113,7 @@ class Input {
 			console.warn("There is no Storage, so I can't save key bindings.");
 			return;
 		}
-		let ds = localStorage.ds || [];
+		let ds = JSON.parse(localStorage.ds || '[]');
 		let ks = [];
 		// reset before changing
 		localStorage.removeItem('ks');
@@ -156,9 +156,53 @@ class Input {
 		localStorage['ks'] = JSON.stringify(ks);
 	}
 	/** @todo load the layout from localStorage */
-	restore() {}
+	restore() {
+		let ds = null;
+		let ks = null;
+		if (typeof(Storage) !== 'undefined') {
+			ds = JSON.parse(localStorage.ds || '[]');
+			ks = JSON.parse(localStorage.ks || '[]');
+			let pads = game.input.gamepad._gamepads;
+			// is needed to change timestamps on gamepads
+			let ls_ds = JSON.parse(localStorage.ds || '[]');
+			for (let i = 0; i < ds.length; ++i) {
+				let pad = _.find(pads, (p) => {
+					return p._rawPad && ds[i].id === p._rawPad.id;
+				});
+				if (pad === undefined) continue;
+				ds[i]['d'] = pad;
+				ls_ds[i]['t'] = Math.floor(Date.now() / 60000);
+			}
+			localStorage.ds = JSON.stringify(ls_ds);
+		} else {
+			console.warn("There is no Storage. Dafaults will be loaded.");
+		}
+
+		for (let p = 0; p < DEFAULT_BINDS.length; ++p)
+		for (let a in DEFAULT_BINDS[p]) {
+			// set a custom binding
+			// if not available, set default
+			let key = _.find(ks, (k) => {
+				return k.p === p && k.a === a;
+			})
+			if (key !== undefined && (key.d === -1 || ds[key.d].d)) {
+				this.p[p][a] = new Key(
+					key.d === -1 ? game.input.keyboard : ds[key.d].d,
+					key.k,
+					key.ax !== null ? key.ax : undefined
+				);
+			} else {
+				this.p[p][a] = new Key(game.input.keyboard,
+					DEFAULT_BINDS[p][a]);
+			}
+		}
+	}
 	/** @todo remove the layout info from localStorage and restore defaults */
-	reset() {}
+	reset() {
+		localStorage.removeItem('ks');
+		localStorage.removeItem('ds');
+		this.restore();
+	}
 }
 
 /**
