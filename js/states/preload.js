@@ -6,6 +6,7 @@ states['preload'] = {
 			TILE_SIZE, TILE_SIZE);
 	},
 	create: () => {
-		game.state.start('menu');
+		//game.state.start('menu');
+		game.state.start('game');
 	}
 };

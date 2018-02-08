@@ -7,9 +7,17 @@ states['game'] = {
 		document.querySelector('canvas').oncontextmenu
 			= function() { return false; };
 
-		sounds.eat = game.add.audio('eat')
 		grid = new Grid(SIZE.W, SIZE.H);
 		input = new Input();
+
+		game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+		game.input.onDown.add(() => {
+			if (game.scale.isFullScreen) {
+				game.scale.stopFullScreen();
+			} else {
+				game.scale.startFullScreen(false);
+			}
+		}, this);
 
 		// demo mode
 		let ts = [0,1,2,6,7,8,9,10];
