@@ -13,6 +13,12 @@ const SPEED = {
 	FRUIT_FALL: 8
 }
 
+const FALLING_TYPES = [
+	MINO_TYPE.ACTIVE,
+	MINO_TYPE.DEAD,
+	MINO_TYPE.FRUIT
+];
+
 function init() {
 	const config = {
 		width: 768,
@@ -29,4 +35,8 @@ function init() {
 	}
 	game.state.start('preload');
 	//scores_view = document.getElementById('hudscore');
+}
+
+function rndAB(A, B) {
+    return Math.floor(Math.random() * (B - A + 1) + A);
 }

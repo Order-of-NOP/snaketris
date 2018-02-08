@@ -4,18 +4,18 @@ class Snake
 	constructor(_x, _y) {
 
 		this.dirs = {
-			left: {x: -1, y: 0},
-			right: {x: 1, y: 0},
-			down: {x: 0, y: 1},
-			up: {x: 0, y: -1}
+			left: [-1, 0],
+			right: [1, 0],
+			down: [0, 1],
+			up: [0, -1]
 		};
 
         this.cur_dir = 'left';
         
 		this.seg = [
-            {x: _x,     y: _y},
-            {x: _x + 1, y: _y},
-			{x: _x + 2, y: _y}
+			[_x, _y],
+			[_x + 1, _y + 1],
+			[_x + 2, _y + 2]
         ];
     }
 
@@ -23,7 +23,7 @@ class Snake
     
     get_tail() { return this.seg[this.seg.length - 1]}
     
-	push_segment(_x, _y) { this.seg.push({x: _x, y: _y}); }
+	push_segment(_x, _y) { this.seg.push([_x, _y]); }
 	
 	set_pos(li) { this.seg = li; }
 	
@@ -37,21 +37,18 @@ class Snake
 
 	move() {
 		// set last direction
-		let _x = this.cur_dir.x;
-		let _y = this.cur_dir.y;
-
 		let n_c = [];
 		// copy position
 		for(let i = 0; i < this.seg.length; i++)
-			n_c.push({ x: this.seg[i].x, y: this.seg[i].y })
+			n_c.push([ this.seg[i].x, this.seg[i].y ])
 		// moving body
 		for(let i = n_c.length - 1; i > 0; i--) {
-			n_c[i].x = n_c[i-1].x;
-			n_c[i].y = n_c[i-1].y;
+			n_c[i][0] = n_c[i-1][0];
+			n_c[i][1] = n_c[i-1][1];
 		}
 		// moving head
-		n_c[0].x += _x;
-		n_c[0].y += _y
+		n_c[0][0] += this.cur.dir[0];
+		n_c[0][1] += this.cur_dir[1];
 		// returnign new position
 		return n_c;
 	}
