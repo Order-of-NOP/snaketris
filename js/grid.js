@@ -64,6 +64,11 @@ class Grid {
 		 */
 		this.sg = new Array(h).fill(null).map(row => new Array(w).fill(null));
 
+		/**
+		 * A hash-map of lists of callbacks with MINO_TYPE.toString() as keys.
+		 */
+		this._cbs = {};
+
 		// wipe all the grids
 		for (let r = 0; r < h; ++r)
 		for (let c = 0; c < w; ++c) {
@@ -87,6 +92,10 @@ class Grid {
 		for (let c = 0; c < this.w; ++c) {
 			this.g[r][c] = MINO_TYPE.EMPTY;
 			this.sg[r][c].play(MINO_TYPE.EMPTY.toString());
+		}
+		// callback function calls
+		if ('clear' in this._cbs) {
+			_.each(this._cbs['clear'], (f) => { f(); });
 		}
 	}
 	/**
@@ -148,5 +157,36 @@ class Grid {
 			this.g[y][x] = type;
 			this.sg[y][x].play(type.toString());
 		});
+	}
+
+	/**
+	 * Add a callback to be called after an event.
+	 * @params {number|string} evt - one of srtings: "clear"
+	 * @params {function} f - function to be called with parameters sent to
+	 * a related function
+	 */
+	add_callback(evt, f) {
+		/* sanity check */
+		if (typeof(evt) !== 'string') {
+			console.warn('evt is not a string');
+			return;
+		}
+		if (typeof(f) !== 'function') {
+			console.warn('f is not a function');
+			return;
+		}
+		if (this._cbs[evt]) {
+			this._cbs[evt].push(f);
+		} else {
+			this._cbs[evt] = [f];
+		}
+	}
+
+	/**
+	 * Remove all the callbacks for a specified event.
+	 * @param {number} evt - an event for callbacks to be deleted
+	 */
+	rm_callbacks(evt) {
+		delete this._cbs[evt.toString()];
 	}
 }

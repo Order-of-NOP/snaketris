@@ -36,7 +36,3 @@ function init() {
 	game.state.start('preload');
 	//scores_view = document.getElementById('hudscore');
 }
-
-function rndAB(A, B) {
-    return Math.floor(Math.random() * (B - A + 1) + A);
-}
