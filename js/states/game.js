@@ -24,7 +24,7 @@ states['game'] = {
 		let tick_time = 100;
 		clk = game.time.create(false);
 		clk.loop(tick_time, tick, this)
-		// TODO preparings
+
 		snake = new Snake(5, 5);
 		tetr = spawn_tetr();
 		clk.start();
@@ -56,19 +56,21 @@ function draw_fruit() {
 	// static active fruit (need for collision between fruit)
 	let fruit_s = [];
 	// create list of new coords
-	let n_c = _.map(fruit, (e)=>{ return [e[0], e[1] + 1]});
+	let n_c = _.map(fruit, (e) => { return [e[0], e[1] + 1] });
 	// get collide indexes
 	let res = grid.collide(n_c);
 	// problem indexes
-	let ids = _.unzip(res); ids = ids.length == 0 ? [] : ids[1];
+	let ids = _.unzip(res);
+	ids = ids.length == 0 ? [] : ids[1];
 	// get normal fruit
-	let _fruit = _.filter(fruit, (e, i) => { return !ids.includes(i);});
+	let _fruit = _.filter(fruit, (e, i) => { return !ids.includes(i); });
 	// resolve collisions
 	for (let i = 0; i < res.length; i++) {
 		let pos = fruit[res[i][1]];
 		// There is reslolve collisions with floor
+		// TODO handle wall collisions when is pushed by Tetr
 		if (res[i][0] == 'floor') {
-			fruit_s.push( [pos[0], pos[1]]);
+			fruit_s.push([pos[0], pos[1]]);
 			res.splice(i, 1); i--;
 		} else {
 			// There is resolve collisions with minos 
@@ -80,11 +82,11 @@ function draw_fruit() {
 					_fruit.push([pos[0], pos[1] - 1]);
 				} break;
 				case MINO_TYPE.STILL: {
-					fruit_s.push( [pos[0], pos[1]])
+					fruit_s.push([pos[0], pos[1]])
 					res.splice(i, 1); i--;
 				} break;
 				case MINO_TYPE.HEAVY: {
-					fruit_s.push( [pos[0], pos[1]])
+					fruit_s.push([pos[0], pos[1]])
 					res.splice(i, 1); i--;
 				} break;
 				case MINO_TYPE.DEAD: {
@@ -106,6 +108,7 @@ function draw_fruit() {
 	// draw current iteration's static fruit
 	if (fruit_s.length > 0)
 		grid.set(fruit_s, MINO_TYPE.HEAVY);
+	// TODO food Snake with some fruit!
 }
 
 function tick() {

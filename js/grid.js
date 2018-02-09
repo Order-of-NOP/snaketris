@@ -121,7 +121,7 @@ class Grid {
 			// we can't pick a point when it's out of bounds
 			if (in_bounds) {
 				let t = this.g[y][x];
-				console.log(JSON.stringify(t));
+				//console.log(JSON.stringify(t));
 				if (t !== MINO_TYPE.EMPTY) {
 					res.push([this.g[y][x], i]);
 				}
