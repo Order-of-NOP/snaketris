@@ -108,17 +108,16 @@ function draw_fruit() {
 		grid.set(fruit_s, MINO_TYPE.HEAVY);
 }
 
-function fruit_iter() {
-	if (fruit.length == 0)
-		spawn_fruit();
-	draw_fruit();
-}
-
 function tick() {
 	// Actions with fruit (draw, collisions e.t.c)
-	if (ticks % SPEED.FRUIT_FALL == 0) {
-		fruit_iter();
+	if (ticks % SPEED.FOOD == 0) {
+		spawn_fruit();
 	}
+
+	if (ticks % SPEED.FRUIT_FALL == 0) {
+		draw_fruit();
+	}
+
 	// Don't remove
 	ticks++;
 	let m = _.max(SPEED);
