@@ -4,18 +4,15 @@ let clk = null;
 let ticks = 0;
 let snake;
 let tetr;
-// active fruits
-let fruits_a = [];
-// static active fruits
-let fruits_s = [];
-
+// active fruit
+let fruit = [];
 
 function spawn_tetr() {
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
 }
 
 function spawn_fruit() {
-	fruits_a.push([rndAB(0, SIZE.W), 0]);
+	fruit.push([rndAB(0, SIZE.W - 1), 0]);
 }
 
 // TODO handle pause
@@ -38,17 +35,6 @@ states['game'] = {
 				game.scale.startFullScreen(false);
 			}
 		}, this);
-		fruits_a = [
-			[0, 0],
-			[0, 1],
-			[SIZE.W/2, 0],
-			[SIZE.W-1, 0],
-			[3, 0],
-		];
-		grid.set([[0, 3]], MINO_TYPE.DEAD);
-		/*spawn_fruit();
-		spawn_fruit();
-		spawn_fruit();*/
 	},
 	update: () => {
 		if (input.p[0]['down'].isDown) {
@@ -66,85 +52,73 @@ states['game'] = {
 	}
 }
 
-function draw_fruits_a() {
+function draw_fruit() {
+	// static active fruit (need for collision between fruit)
+	let fruit_s = [];
 	// create list of new coords
-	let n_c = [];
-	// init new coord
-	for (let i = 0; i < fruits_a.length; i++) {
-		n_c.push( [fruits_a[i][0], fruits_a[i][1] + 1] );
-	}
+	let n_c = _.map(fruit, (e)=>{ return [e[0], e[1] + 1]});
 	// get collide indexes
-	let res = grid.collide_down(n_c);
+	let res = grid.collide(n_c);
 	// problem indexes
-	let ids = [];
-	for (let i = 0; i < res.length; i++)
-		ids.push(res[i][1]);
-	// get normal fruits
-	let _fruits_a = [];
-	for(let i = 0; i < fruits_a.length; i++) {
-		if (ids.includes(i)) continue;
-		_fruits_a.push(fruits_a[i]);
-	}
+	let ids = _.unzip(res); ids = ids.length == 0 ? [] : ids[1];
+	// get normal fruit
+	let _fruit = _.filter(fruit, (e, i) => { return !ids.includes(i);});
 	// resolve collisions
 	for (let i = 0; i < res.length; i++) {
-		let pos = fruits_a[res[i][1]];
-		// collide fruits with floor
+		let pos = fruit[res[i][1]];
+		// There is reslolve collisions with floor
 		if (res[i][0] == 'floor') {
-			fruits_s.push( [pos[0], pos[1]])
-			res.splice(i, 1);
-			i--;
+			fruit_s.push( [pos[0], pos[1]]);
+			res.splice(i, 1); i--;
 		} else {
-			// colliding with MINO_TYPES
+			// There is resolve collisions with minos 
 			switch(res[i][0]) {
 				case MINO_TYPE.SNAKE: {
-					_fruits_a.push([pos[0], pos[1] - 1]);
+					_fruit.push([pos[0], pos[1] - 1]);
 				} break;
 				case MINO_TYPE.ACTIVE: {
-					_fruits_a.push([pos[0], pos[1] - 1]);
+					_fruit.push([pos[0], pos[1] - 1]);
 				} break;
 				case MINO_TYPE.STILL: {
-					fruits_s.push( [pos[0], pos[1]])
+					fruit_s.push( [pos[0], pos[1]])
 					res.splice(i, 1); i--;
 				} break;
 				case MINO_TYPE.HEAVY: {
-					fruits_s.push( [pos[0], pos[1]])
+					fruit_s.push( [pos[0], pos[1]])
 					res.splice(i, 1); i--;
 				} break;
 				case MINO_TYPE.DEAD: {
-					_fruits_a.push([pos[0], pos[1] - 1]);
+					_fruit.push([pos[0], pos[1] - 1]);
 				} break;
 				case MINO_TYPE.FRUIT: {
-					_fruits_a.push([pos[0], pos[1] - 1]);
+					_fruit.push([pos[0], pos[1] - 1]);
 				} break;
 			}
 		}
 	}
 	// clear
-	grid.set(fruits_a, MINO_TYPE.EMPTY);
-	fruits_a = _fruits_a;
-	// move movable fruits
-	for(let i = 0; i < fruits_a.length; i++) { 
-			fruits_a[i][1]++;
+	grid.set(fruit, MINO_TYPE.EMPTY);
+	fruit = _fruit;
+	// move movable fruit
+	_.each(fruit, (e)=> {e[1]++;});
+	// draw fruit
+	grid.set(fruit, MINO_TYPE.FRUIT);
+	// draw current iteration's static fruit
+	if (fruit_s.length > 0)
+		grid.set(fruit_s, MINO_TYPE.HEAVY);
+}
+
+function fruit_iter() {
+	if (fruit.length == 0)
+		spawn_fruit();
+	draw_fruit();
+}
+
+function tick() {
+	// Actions with fruit (draw, collisions e.t.c)
+	if (ticks % SPEED.FRUIT_FALL == 0) {
+		fruit_iter();
 	}
-	grid.set(fruits_a, MINO_TYPE.FRUIT);
-
-}
-
-function draw_fruits_s() {
-	grid.set(fruits_s, MINO_TYPE.HEAVY);
-}
-
-function tick()
-{
-	grid.set([[0, 3]], MINO_TYPE.DEAD);
-	grid.set([[SIZE.W/2, 5]], MINO_TYPE.STILL);
-	draw_fruits_s();
-	if (ticks % SPEED.FRUIT_FALL == 0)
-		draw_fruits_a();
-
-	//grid.set([[0, 5].reverse()], MINO_TYPE.FRUIT);
-
-	//grid.set([[0,0]], MINO_TYPE.FRUIT);
 	// Don't remove
 	ticks++;
 	let m = _.max(SPEED);

@@ -101,18 +101,6 @@ class Grid {
 	 * `cause` is a cause of collision (can be "wall", "ceil", "floor" or a
 	 * [type of mino]{@link MINO_TYPE} as a number).
 	 */
-	collide_down(li) {
-		let res = [];
-		_.each(li, ([x,y], i) => {
-			if (y >= this.h)
-				res.push(['floor', i]);
-			else
-			if (this.g[y][x] != MINO_TYPE.EMPTY) 
-				res.push([this.g[y][x], i]);
-		});
-		return res;
-	}
-
 	collide(li) {
 		let res = [];
 		_.each(li, ([x,y], i) => {
