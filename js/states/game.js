@@ -12,7 +12,21 @@ function spawn_tetr() {
 }
 
 function spawn_fruit() {
-	let pos = [rndAB(0, SIZE.W - 1), 0];
+	let xs, y;
+	/* loop through all the lines seeking for an empty space */
+	for (y = 0; y < SIZE.H; ++y) {
+		xs = _.filter(_.range(SIZE.W), (x) => {
+			return grid.collide([[x, y]]).length === 0;
+		});
+		if (xs.length > 0) break;
+	}
+	if (y === SIZE.H) {
+		console.warn('Whoa! No place for fruit!');
+		return;
+	}
+	let pos = [_.sample(xs), y];
+
+	//let pos = [_.random(0, SIZE.W - 1), 0];
 	grid.set([pos], MINO_TYPE.FRUIT);
 	fruit.push(pos);
 }
@@ -38,6 +52,10 @@ states['game'] = {
 				game.scale.startFullScreen(false);
 			}
 		}, this);*/
+		grid.add_callback('clear', () => {
+			fruit = [];
+			grid._cbs = {};
+		})
 	},
 	update: () => {
 		if (input.p[0]['down'].isDown) {
@@ -49,7 +67,7 @@ states['game'] = {
 	},
 	// When you swith to another state
 	shutdown: () => {
-		grid = new Grid(SIZE.W, SIZE.H);
+		grid.clear();
 		ticks = 0;
 		clk.destroy();
 	}
@@ -60,9 +78,9 @@ function draw_fruit() {
 	let fruit_s = [];
 	// create list of new coords
 	let n_c = _.map(fruit, (e) => { return [e[0], e[1] + 1] });
-	// get collide indexes
+	// get collisions
 	let res = grid.collide(n_c);
-	// problem indexes
+	// collided indices
 	let ids = _.unzip(res);
 	ids = ids.length == 0 ? [] : ids[1];
 	// get normal fruit
@@ -96,7 +114,22 @@ function draw_fruit() {
 					_fruit.push([pos[0], pos[1] - 1]);
 				} break;
 				case MINO_TYPE.FRUIT: {
-					_fruit.push([pos[0], pos[1] - 1]);
+					// TODO too complex. Can be made simple
+					// этот код позволяет фруктам не блокировать друг друга при
+					// падении. Код сканирует столбец грида вниз начиная с pos,
+					// пока не наткнётся на что-то, кроме фрукта
+					let stuck = true;
+					for (let y = pos[1]+1; i < SIZE.H; ++y) {
+						let t = grid.collide([[pos[0], y]]);
+						if (t.length === 0) {
+							_fruit.push([pos[0], pos[1]]);
+							stuck = false;
+							break;
+						}
+						else if (t[0][0] === MINO_TYPE.FRUIT) continue;
+						else break;
+					}
+					if (stuck) _fruit.push([pos[0], pos[1] - 1]);
 				} break;
 			}
 		}
@@ -116,6 +149,8 @@ function draw_fruit() {
 }
 
 function tick() {
+	// TODO snake goes here
+	// TODO tetr goes here
 	// Actions with fruit (draw, collisions e.t.c)
 	// NOTE: always draw fruit before spawning another one
 	if (ticks % SPEED.FRUIT_FALL == 0) {
