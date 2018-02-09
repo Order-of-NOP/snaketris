@@ -12,7 +12,9 @@ function spawn_tetr() {
 }
 
 function spawn_fruit() {
-	fruit.push([rndAB(0, SIZE.W - 1), 0]);
+	let pos = [rndAB(0, SIZE.W - 1), 0];
+	grid.set([pos], MINO_TYPE.FRUIT);
+	fruit.push(pos);
 }
 
 // TODO handle pause
@@ -28,13 +30,14 @@ states['game'] = {
 		snake = new Snake(5, 5);
 		tetr = spawn_tetr();
 		clk.start();
-		game.input.onDown.add(() => {
+		// TODO uncomment when making fullscreen
+		/*game.input.onDown.add(() => {
 			if (game.scale.isFullScreen) {
 				game.scale.stopFullScreen();
 			} else {
 				game.scale.startFullScreen(false);
 			}
-		}, this);
+		}, this);*/
 	},
 	update: () => {
 		if (input.p[0]['down'].isDown) {
@@ -102,23 +105,25 @@ function draw_fruit() {
 	grid.set(fruit, MINO_TYPE.EMPTY);
 	fruit = _fruit;
 	// move movable fruit
-	_.each(fruit, (e)=> {e[1]++;});
+	_.each(fruit, (e) => { e[1]++; });
 	// draw fruit
 	grid.set(fruit, MINO_TYPE.FRUIT);
 	// draw current iteration's static fruit
-	if (fruit_s.length > 0)
+	if (fruit_s.length > 0) {
 		grid.set(fruit_s, MINO_TYPE.HEAVY);
+	}
 	// TODO food Snake with some fruit!
 }
 
 function tick() {
 	// Actions with fruit (draw, collisions e.t.c)
-	if (ticks % SPEED.FOOD == 0) {
-		spawn_fruit();
-	}
-
+	// NOTE: always draw fruit before spawning another one
 	if (ticks % SPEED.FRUIT_FALL == 0) {
 		draw_fruit();
+	}
+
+	if (ticks % SPEED.FOOD == 0) {
+		spawn_fruit();
 	}
 
 	// Don't remove
