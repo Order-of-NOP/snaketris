@@ -4,15 +4,23 @@ let input;
 let states = {};
 
 const SIZE = {H: 18, W: 24};
-// reltive speed values
+// relative speed values
+// TIP: less -> faster
 const SPEED = {
 	SNAKE: 2,
 	TETR_BOOST: 1,
 	TETR: 8,
-	FOOD: 48,
+	//FOOD: 48,
+	FOOD: 4,
 	FRUIT_FALL: 8
 }
 
+const PL = {
+	SNAKE: 0,
+	TETR: 1
+};
+
+// TODO do we need this?
 const FALLING_TYPES = [
 	MINO_TYPE.ACTIVE,
 	MINO_TYPE.DEAD,

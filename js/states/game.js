@@ -6,8 +6,11 @@ let snake;
 let tetr;
 // active fruit
 let fruit = [];
+// fruit that was moved by Tetr in the current tick
+let ttf = [];
 
 function spawn_tetr() {
+	// TODO check collisions w/ snake and fruit
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
 }
 
@@ -25,8 +28,6 @@ function spawn_fruit() {
 		return;
 	}
 	let pos = [_.sample(xs), y];
-
-	//let pos = [_.random(0, SIZE.W - 1), 0];
 	grid.set([pos], MINO_TYPE.FRUIT);
 	fruit.push(pos);
 }
@@ -55,15 +56,16 @@ states['game'] = {
 		grid.add_callback('clear', () => {
 			fruit = [];
 			grid._cbs = {};
-		})
+		});
+
+		grid.set(tetr.minos, MINO_TYPE.ACTIVE);
 	},
 	update: () => {
-		if (input.p[0]['down'].isDown) {
-			console.log('head bend over');
-		}
-		if (input.p[1]['up'].justReleased) {
-			console.log('raise da pasterior');
-		}
+		tetr.boost = input.p[PL.TETR]['down'].isDown;
+		tetr.x_dir =
+			(input.p[PL.TETR]['left'].isDown)*X_DIR.LEFT +
+			(input.p[PL.TETR]['right'].isDown)*X_DIR.RIGHT;
+		if (input.p[PL.TETR]['up'].justReleased) tetr.to_rotate = true;
 	},
 	// When you swith to another state
 	shutdown: () => {
@@ -82,9 +84,12 @@ function draw_fruit() {
 	let res = grid.collide(n_c);
 	// collided indices
 	let ids = _.unzip(res);
-	ids = ids.length == 0 ? [] : ids[1];
-	// get normal fruit
-	let _fruit = _.filter(fruit, (e, i) => { return !ids.includes(i); });
+	ids = ids.length === 0 ? [] : ids[1];
+	// final result. Storing not collided fruit now
+	let _fruit = _.filter(fruit, (e, i) => {
+		// TODO check tetr_threaten
+		return !ids.includes(i);
+	});
 	// resolve collisions
 	for (let i = 0; i < res.length; i++) {
 		let pos = fruit[res[i][1]];
@@ -148,16 +153,97 @@ function draw_fruit() {
 	// TODO food Snake with some fruit!
 }
 
+// TODO возможно исчезание фруктов, проверить этот кейс позже
+function tetr_fall() {
+	// return threaten fruit. Maybe to take it back later
+	fruit = fruit.concat(ttf);
+	ttf = [];
+	let np = tetr.move('down');
+	let cs = _.filter(grid.collide(np), (p) => {
+		return p[0] !== MINO_TYPE.ACTIVE;
+	})
+	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
+		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
+	let blockers = ['floor', MINO_TYPE.STILL, MINO_TYPE.HEAVY, MINO_TYPE.DEAD];
+	for (let i = 0; i < cs.length; ++i) {
+		let [c, n] = cs[i];
+		if (c === 'wall') console.warn('id10t: What? A wall down there? 0_o');
+		if (blockers.indexOf(c) >= 0) {
+			grid.set(tetr.minos, MINO_TYPE.STILL);
+			tetr = spawn_tetr();
+			grid.set(tetr.minos, MINO_TYPE.ACTIVE);
+			return;
+		}
+		if (snake_body.indexOf(c) >= 0) {
+			// TODO collide w/ snake
+		}
+		if (c === MINO_TYPE.FRUIT) {
+			let f = np[n];
+			let find_f = (el) => { return el[0] === f[0] && el[1] === f[1]; }
+			// stop tracking gravity on this fruit
+			let f_idx = _.findIndex(fruit, find_f);
+			if (f_idx >= 0) {
+				fruit.splice(f_idx, 1);
+				grid.set([f], MINO_TYPE.EMPTY);
+			}
+			f = [f[0], f[1] + 1];
+			let fc = grid.collide([f]);
+			if (fc.length === 0) {
+				grid.set([f], MINO_TYPE.FRUIT);
+				ttf.push(f);
+			} else {
+				// smash the fruit!
+				// TODO play an animation
+			}
+		}
+	}
+	// the way is free
+	grid.set(tetr.minos, MINO_TYPE.EMPTY);
+	tetr.set_pos(np);
+	grid.set(np, MINO_TYPE.ACTIVE);
+}
+
+// TODO ...
+function tetr_rotate() {
+	if (!tetr.to_rotate) return;
+	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
+		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
+	let blockers = ['wall', 'floor', MINO_TYPE.STILL, MINO_TYPE.HEAVY,
+		MINO_TYPE.DEAD];
+	let np = tetr.rotate();
+	let cs = _.filter(grid.collide(np), (p) => {
+		return p[0] !== MINO_TYPE.ACTIVE;
+	});
+	for (let i = 0; i < cs.length; ++i) {
+		let [c, n] = cs[i];
+		if (blockers.indexOf(c) >= 0) return;
+		if (c === MINO_TYPE.FRUIT) {
+			// TODO ...
+		}
+	}
+	grid.set(tetr.minos, MINO_TYPE.EMPTY);
+	tetr.set_pos(np);
+	grid.set(np, MINO_TYPE.ACTIVE);
+	tetr.to_rotate = false;
+}
+
 function tick() {
 	// TODO snake goes here
-	// TODO tetr goes here
+	// tetr goes here
+	if (ticks % SPEED.TETR_BOOST) {
+		tetr_rotate();
+		tetr_move();
+	}
+	if (ticks % (tetr.boost ? SPEED.TETR_BOOST : SPEED.TETR) === 0) {
+		tetr_fall();
+	}
 	// Actions with fruit (draw, collisions e.t.c)
 	// NOTE: always draw fruit before spawning another one
-	if (ticks % SPEED.FRUIT_FALL == 0) {
+	if (ticks % SPEED.FRUIT_FALL === 0) {
 		draw_fruit();
 	}
 
-	if (ticks % SPEED.FOOD == 0) {
+	if (ticks % SPEED.FOOD === 0) {
 		spawn_fruit();
 	}
 

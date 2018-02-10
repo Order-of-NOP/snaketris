@@ -1,13 +1,23 @@
 /* tetris.js */
 
+// IMPORTANT: it's crucial to keep NONE = 0
+const X_DIR = {
+	NONE: 0,
+	LEFT: -1,
+	RIGHT: 1
+};
+
 class Tetrimino {
 	// Note: init_mino is the center mino of the shape,
 	// so it sould be placed in the center of the grid.
 	constructor(shape, init_mino) {
 		// Figure shape status from set {i, o, z, t, l, s, j}.
 		this.shape = shape; 
+		// to be set from update
 		this.boost = false;
-		// Consider 0th mino as the center one.
+		this.to_rotate = false;
+		this.x_dir = X_DIR.NONE;
+		// consider 0th mino is the center one
 		if (shape === 'i') {
 			this.minos = [
 				[init_mino[0], init_mino[1]],
