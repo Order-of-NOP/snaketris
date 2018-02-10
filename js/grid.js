@@ -20,7 +20,8 @@ const MINO_TYPE = {
 	// dead snake
 	DEAD: 9,
 	// snake food
-	FRUIT: 10
+	FRUIT: 10,
+	// see draw snake in js/states/game.js
 };
 
 /**

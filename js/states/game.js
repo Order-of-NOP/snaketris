@@ -148,8 +148,18 @@ function draw_fruit() {
 	// TODO food Snake with some fruit!
 }
 
+function draw_snake() {
+	let h = snake.get_head();
+	// set head sprite
+	grid.set([h], DIR_HEAD[snake.cur_dir]);
+	grid.set(snake.seg.slice(1), MINO_TYPE.SNAKE);
+}
+
 function tick() {
 	// TODO snake goes here
+	if (ticks % SPEED.SNAKE == 0) {
+		draw_snake();
+	}
 	// TODO tetr goes here
 	// Actions with fruit (draw, collisions e.t.c)
 	// NOTE: always draw fruit before spawning another one

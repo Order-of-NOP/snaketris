@@ -13,11 +13,12 @@ const SPEED = {
 	FRUIT_FALL: 8
 }
 
-const FALLING_TYPES = [
-	MINO_TYPE.ACTIVE,
-	MINO_TYPE.DEAD,
-	MINO_TYPE.FRUIT
-];
+const DIR_HEAD = {
+	left: MINO_TYPE.HEAD_L,
+	right: MINO_TYPE.HEAD_R,
+	up: MINO_TYPE.HEAD_U,
+	down: MINO_TYPE.HEAD_D
+}
 
 function init() {
 	const config = {
