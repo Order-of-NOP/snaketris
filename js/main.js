@@ -10,7 +10,8 @@ const SPEED = {
 	TETR_BOOST: 1,
 	TETR: 8,
 	FOOD: 48,
-	FRUIT_FALL: 8
+	FRUIT_FALL: 8,
+	SNAKE_FALL: 1
 }
 
 const DIR_HEAD = {

@@ -6,6 +6,8 @@ let snake;
 let tetr;
 // active fruit
 let fruit = [];
+// dead snake 
+let snake_d = [];
 
 function spawn_tetr() {
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
@@ -58,9 +60,21 @@ states['game'] = {
 		})
 	},
 	update: () => {
-		if (input.p[0]['down'].isDown) {
-			console.log('head bend over');
+		// For Snake
+		if (input.p[0]['down'].justReleased) {
+			snake.set_dir('down');
+			console.log('snake down');
+		} else if (input.p[0]['up'].justReleased) {
+			snake.set_dir('up');
+			console.log('snake up');
+		} else if (input.p[0]['left'].justReleased) {
+			snake.set_dir('left');
+			console.log('snake left');
+		} if (input.p[0]['right'].justReleased) {
+			snake.set_dir('right');
+			console.log('snake right');
 		}
+		// For Tetris
 		if (input.p[1]['up'].justReleased) {
 			console.log('raise da pasterior');
 		}
@@ -74,45 +88,37 @@ states['game'] = {
 }
 
 function draw_fruit() {
+	// return previous position
+	let ret_pos = (l,p) => { l.push([p[0], p[1] - 1]); };
+	// send fruit to static
+	let to_static = (l,p,r,i) => { l.push([p[0], p[1]]); r.splice(i,1); i--; };
+	// snake eat fall fruit
+	let snk_eat = (r,i) => { r.splice(i,1); i--; snake.push_seg(); }
 	// static active fruit (need for collision between fruit)
 	let fruit_s = [];
 	// create list of new coords
 	let n_c = _.map(fruit, (e) => { return [e[0], e[1] + 1] });
 	// get collisions
-	let res = grid.collide(n_c);
+	var res = grid.collide(n_c);
 	// collided indices
-	let ids = _.unzip(res);
-	ids = ids.length == 0 ? [] : ids[1];
+	let ids = _.unzip(res);	ids = ids.length == 0 ? [] : ids[1];
 	// get normal fruit
 	let _fruit = _.filter(fruit, (e, i) => { return !ids.includes(i); });
 	// resolve collisions
-	for (let i = 0; i < res.length; i++) {
+	for (var i = 0; i < res.length; i++) {
 		let pos = fruit[res[i][1]];
 		// There is reslolve collisions with floor
 		// TODO handle wall collisions when is pushed by Tetr
 		if (res[i][0] == 'floor') {
-			fruit_s.push([pos[0], pos[1]]);
-			res.splice(i, 1); i--;
+			to_static(fruit_s, pos, res, i);
 		} else {
 			// There is resolve collisions with minos 
 			switch(res[i][0]) {
-				case MINO_TYPE.SNAKE: {
-					_fruit.push([pos[0], pos[1] - 1]);
-				} break;
-				case MINO_TYPE.ACTIVE: {
-					_fruit.push([pos[0], pos[1] - 1]);
-				} break;
-				case MINO_TYPE.STILL: {
-					fruit_s.push([pos[0], pos[1]])
-					res.splice(i, 1); i--;
-				} break;
-				case MINO_TYPE.HEAVY: {
-					fruit_s.push([pos[0], pos[1]])
-					res.splice(i, 1); i--;
-				} break;
-				case MINO_TYPE.DEAD: {
-					_fruit.push([pos[0], pos[1] - 1]);
-				} break;
+				case MINO_TYPE.SNAKE: ret_pos(_fruit, pos); break;
+				case MINO_TYPE.ACTIVE: ret_pos(_fruit, pos); break;
+				case MINO_TYPE.STILL: to_static(fruit_s, pos, res, i); break;
+				case MINO_TYPE.HEAVY: to_static(fruit_s, pos, res, i); break;
+				case MINO_TYPE.DEAD: to_static(fruit_s, pos, res, i); break;
 				case MINO_TYPE.FRUIT: {
 					// TODO too complex. Can be made simple
 					// этот код позволяет фруктам не блокировать друг друга при
@@ -131,11 +137,17 @@ function draw_fruit() {
 					}
 					if (stuck) _fruit.push([pos[0], pos[1] - 1]);
 				} break;
+				// Additional cases
+				case MINO_TYPE.HEAD_U: snk_eat(res, i); break;
+				case MINO_TYPE.HEAD_L: snk_eat(res, i); break;
+				case MINO_TYPE.HEAD_R: snk_eat(res, i); break;
+				case MINO_TYPE.HEAD_D: snk_eat(res, i); break;
 			}
 		}
 	}
 	// clear
 	grid.set(fruit, MINO_TYPE.EMPTY);
+	// switch previous pos
 	fruit = _fruit;
 	// move movable fruit
 	_.each(fruit, (e) => { e[1]++; });
@@ -148,17 +160,130 @@ function draw_fruit() {
 	// TODO food Snake with some fruit!
 }
 
+
+function spawn_snake_at() {
+	// TODO player chose place for spawn
+	// Make timer 
+	snake.reset(5,5);
+}
+
+// !!! WARNING
+// I have done collide with head only
+
 function draw_snake() {
-	let h = snake.get_head();
+	// get new coord
+	let n_c = snake.move();
+	// get collisions with gead only!!!
+	let res = grid.collide([n_c[0]]);
+	// resolve collisions
+	for(let i = 0; i < res.length; i++) {
+		let ind = res[i][1];
+		let type = res[i][0];
+		// if head of snake collide
+		if (ind === 0) {
+			if (type != MINO_TYPE.FRUIT) {
+				// Without this if snake can kill self
+				if (type != MINO_TYPE.SNAKE) {
+					grid.set(snake.seg, MINO_TYPE.EMPTY);
+					for(let k = 0; k < snake.seg.length; k++) {
+						snake_d.push(snake.seg[k]);
+					}
+					spawn_snake_at();
+					return;
+				} else { // Theris snake cut self
+					let it = -1;
+					for(let k = 1; k < n_c.length; k++)
+						if (n_c[k][0] == n_c[0][0] &&
+							n_c[k][1] == n_c[0][1]) {
+								it = k;
+								break;
+							}
+					if (it != -1) {
+					// get part alive snake
+					let half_f = n_c.splice(0, it);
+					// clear parts of snake
+					let tail_d = [];
+					for(let k = snake.seg.length - 1; k > it-1; k-- ) {
+						tail_d.push(snake.seg[k]);
+					}
+					grid.set(tail_d, MINO_TYPE.EMPTY);
+					// push dead part of snake to snake_d
+					for(let k = 0; k < n_c.length; k++) {
+						snake_d.push(n_c[k]);
+					}
+					// swap n_c
+					n_c = half_f;
+					}
+				}
+			} else { // snake eat it
+				// add new segment
+				let n = snake.seg.length - 1;
+				n_c.push([snake.seg[n][0], snake.seg[n][1]])
+				// find fruit with this position and pop it
+				for(let k = 0; k < fruit.length; k++) {
+					if (fruit[k][0] == n_c[0][0] && fruit[k][1] == n_c[0][1]) {
+						// pop elem
+						fruit.splice(k, 1);
+						// clean map
+						grid.set([[n_c[0][0], n_c[0][1]]], MINO_TYPE.EMPTY);
+						break;
+					}
+				}
+			}
+		} 
+	}
+
+	let h = n_c[0];
+	// clear
+	try
+	{
+	grid.set(snake.seg, MINO_TYPE.EMPTY);
+	// draw head
+	grid.set(n_c, MINO_TYPE.SNAKE);
 	// set head sprite
 	grid.set([h], DIR_HEAD[snake.cur_dir]);
-	grid.set(snake.seg.slice(1), MINO_TYPE.SNAKE);
+	// snake set new pos
+	snake.set_pos(n_c);
+	}
+	catch(e){
+		console.log(e);
+	}
+}
+
+function draw_snake_d() {
+	// for each snake_d check bottom
+	// and move it if there is nothing
+	let n_c = [];
+	// Important ! There is drawing segments
+	// for correct next loop _.each
+	grid.set(snake_d, MINO_TYPE.DEAD);
+
+	_.each(snake_d, (e) => {
+		let _x = e[0];
+		let _y = e[1] + 1;
+		if (_y < SIZE.H) {
+			if (grid.g[_y][_x] === MINO_TYPE.EMPTY) {
+				n_c.push([_x, _y]);
+			} else {
+				n_c.push([_x, _y - 1]);	
+			}
+		} else {
+			n_c.push([_x, _y - 1]);
+		}
+	});
+	grid.set(snake_d, MINO_TYPE.EMPTY);
+	grid.set(n_c, MINO_TYPE.DEAD);
+	snake_d = n_c;
 }
 
 function tick() {
 	// TODO snake goes here
 	if (ticks % SPEED.SNAKE == 0) {
 		draw_snake();
+	}
+	// draw snake segments
+	if (ticks % SPEED.SNAKE_FALL == 0) {
+		draw_snake_d();
 	}
 	// TODO tetr goes here
 	// Actions with fruit (draw, collisions e.t.c)
