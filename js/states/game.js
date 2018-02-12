@@ -8,6 +8,18 @@ let tetr;
 let fruit = [];
 // dead snake 
 let snake_d = [];
+// for snake respawn timer
+let snk_spwn_time = 0.0;
+//  for spawn animation 
+let timer_anim = null;
+let snk_spwn_anim_dl = 100;
+let snk_spwn_anm_alph = 0.0;
+// delay spawn in milliseconds
+let snk_spwn_dl = 5000;
+// snake's spawn positions
+let SPAWN_PALYER_CHOICE = 'right';
+
+let SPAWN_POS_Y = 2;
 
 function spawn_tetr() {
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
@@ -31,6 +43,66 @@ function spawn_fruit() {
 	//let pos = [_.random(0, SIZE.W - 1), 0];
 	grid.set([pos], MINO_TYPE.FRUIT);
 	fruit.push(pos);
+}
+
+function spawn_snake_at() {
+	snake.reset(5,5);
+	if (snake.cur_dir == 'left') {
+		set_left_spwn();
+	} else { set_right_spwn(); }
+	snake.alive = false;
+}
+
+function set_left_spwn() {
+	let n_c = [
+		[5, SPAWN_POS_Y],
+		[4, SPAWN_POS_Y],
+		[3, SPAWN_POS_Y]
+	]
+	_.each(snake.seg, (e)=>{
+		grid.sg[e[1]][e[0]].alpha = 1.0;
+	});
+	grid.set(snake.seg, MINO_TYPE.EMPTY);
+	snake.cur_dir = 'right';
+	snake.set_pos(n_c);
+	grid.set(snake.seg, MINO_TYPE.SNAKE);
+	grid.set([snake.seg[0]], MINO_TYPE.HEAD_L);
+}
+
+function set_right_spwn() {
+	let n_c = [
+		[SIZE.W - 5, SPAWN_POS_Y],
+		[SIZE.W - 5 + 1, SPAWN_POS_Y],
+		[SIZE.W - 5 + 2, SPAWN_POS_Y]
+	]
+	_.each(snake.seg, (e)=>{
+		grid.sg[e[1]][e[0]].alpha = 1.0;
+	});
+	grid.set(snake.seg, MINO_TYPE.EMPTY);
+	snake.cur_dir = 'left';
+	snake.set_pos(n_c);
+	grid.set(snake.seg, MINO_TYPE.SNAKE);
+	grid.set([snake.seg[0]], MINO_TYPE.HEAD_R);
+	console.log(snake.cur_dir);
+}
+
+function anim_flashing_snake() {
+	snk_spwn_anm_alph = (snk_spwn_anm_alph + 0.09) % 1.0;
+	// There is code for time for snake is spawning
+	_.each(snake.seg, (e)=>{
+		grid.sg[e[1]][e[0]].alpha = snk_spwn_anm_alph;
+	});
+	// There is code for end of spawn
+	if (snk_spwn_time < game.time.now) {
+		_.each(snake.seg, (e)=>{
+			grid.sg[e[1]][e[0]].alpha = 1.0;
+		});
+		snake.alive = true;
+		snk_spwn_anm_alph = 0.0;
+		timer_anim.stop(true);
+		timer_anim.destroy();
+		timer_anim = null;
+	}
 }
 
 // TODO handle pause
@@ -62,17 +134,31 @@ states['game'] = {
 	update: () => {
 		// For Snake
 		if (input.p[0]['down'].justReleased) {
-			snake.set_dir('down');
-			console.log('snake down');
+			if (snake.alive) {
+				snake.set_dir('down');
+				console.log('snake down');
+			}
 		} else if (input.p[0]['up'].justReleased) {
-			snake.set_dir('up');
-			console.log('snake up');
+			if (snake.alive) {
+				snake.set_dir('up');
+				console.log('snake up');
+			}
 		} else if (input.p[0]['left'].justReleased) {
-			snake.set_dir('left');
-			console.log('snake left');
+			if (snake.alive) {
+				snake.set_dir('left');
+				console.log('snake left');
+			} else {
+				SPAWN_PALYER_CHOICE = 'left';
+				set_left_spwn();
+			}
 		} if (input.p[0]['right'].justReleased) {
-			snake.set_dir('right');
-			console.log('snake right');
+			if (snake.alive) {
+				snake.set_dir('right');
+				console.log('snake right');
+			} else {
+				SPAWN_PALYER_CHOICE = 'right';
+				set_right_spwn();
+			}
 		}
 		// For Tetris
 		if (input.p[1]['up'].justReleased) {
@@ -160,16 +246,8 @@ function draw_fruit() {
 	// TODO food Snake with some fruit!
 }
 
-
-function spawn_snake_at() {
-	// TODO player chose place for spawn
-	// Make timer 
-	snake.reset(5,5);
-}
-
 // !!! WARNING
 // I have done collide with head only
-
 function draw_snake() {
 	// get new coord
 	let n_c = snake.move();
@@ -188,7 +266,18 @@ function draw_snake() {
 					for(let k = 0; k < snake.seg.length; k++) {
 						snake_d.push(snake.seg[k]);
 					}
+					//adding delay and spawn option
+					snk_spwn_time = game.time.now + snk_spwn_dl;
 					spawn_snake_at();
+					// draw in grid
+					grid.set(snake.seg, MINO_TYPE.SNAKE);
+					grid.set([snake.seg[0]], MINO_TYPE.HEAD_R);
+					// clear timer
+					if (timer_anim !== null) { timer_anim.destroy(); } 
+					// start new animation timer
+					timer_anim = game.time.create(false);
+					timer_anim.loop(snk_spwn_anim_dl, anim_flashing_snake, this);
+					timer_anim.start(0.0);
 					return;
 				} else { // Theris snake cut self
 					let it = -1;
@@ -279,7 +368,9 @@ function draw_snake_d() {
 function tick() {
 	// TODO snake goes here
 	if (ticks % SPEED.SNAKE == 0) {
-		draw_snake();
+		if (snk_spwn_time < game.time.now) {
+			draw_snake();
+		} 
 	}
 	// draw snake segments
 	if (ticks % SPEED.SNAKE_FALL == 0) {
@@ -293,7 +384,9 @@ function tick() {
 	}
 
 	if (ticks % SPEED.FOOD == 0) {
-		spawn_fruit();
+		// if snake isn't alive we aren't spawning fruit
+		if (timer_anim == null)
+			spawn_fruit();
 	}
 
 	// Don't remove

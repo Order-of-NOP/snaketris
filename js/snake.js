@@ -6,6 +6,8 @@ class Snake
 	}
 	
 	reset(_x, _y) {
+		this.alive = true;
+
 		this.dirs = {
 			left: [-1, 0],
 			right: [1, 0],
@@ -18,7 +20,7 @@ class Snake
 		this.seg = [
 			[_x, _y],
 			[_x - 1, _y],
-			[_x - 1, _y]
+			[_x - 2, _y]
         ];
 	}
 

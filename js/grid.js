@@ -159,7 +159,6 @@ class Grid {
 			this.sg[y][x].play(type.toString());
 		});
 	}
-
 	/**
 	 * Add a callback to be called after an event.
 	 * @params {number|string} evt - one of srtings: "clear"
