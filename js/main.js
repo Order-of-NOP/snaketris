@@ -20,13 +20,6 @@ const PL = {
 	TETR: 1
 };
 
-// TODO do we need this?
-const FALLING_TYPES = [
-	MINO_TYPE.ACTIVE,
-	MINO_TYPE.DEAD,
-	MINO_TYPE.FRUIT
-];
-
 function init() {
 	const config = {
 		width: 768,
