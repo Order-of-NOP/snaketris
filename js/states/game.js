@@ -8,18 +8,8 @@ let tetr;
 let fruit = [];
 // dead snake 
 let snake_d = [];
-// for snake respawn timer
-let snk_spwn_time = 0.0;
-//  for spawn animation 
-let timer_anim = null;
-let snk_spwn_anim_dl = 100;
-let snk_spwn_anm_alph = 0.0;
-// delay spawn in milliseconds
-let snk_spwn_dl = 5000;
-// snake's spawn positions
-let SPAWN_PALYER_CHOICE = 'right';
 
-let SPAWN_POS_Y = 2;
+let snake_spawner = null;
 
 function spawn_tetr() {
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
@@ -39,70 +29,8 @@ function spawn_fruit() {
 		return;
 	}
 	let pos = [_.sample(xs), y];
-
-	//let pos = [_.random(0, SIZE.W - 1), 0];
 	grid.set([pos], MINO_TYPE.FRUIT);
 	fruit.push(pos);
-}
-
-function spawn_snake_at() {
-	snake.reset(5,5);
-	if (snake.cur_dir == 'left') {
-		set_left_spwn();
-	} else { set_right_spwn(); }
-	snake.alive = false;
-}
-
-function set_left_spwn() {
-	let n_c = [
-		[5, SPAWN_POS_Y],
-		[4, SPAWN_POS_Y],
-		[3, SPAWN_POS_Y]
-	]
-	_.each(snake.seg, (e)=>{
-		grid.sg[e[1]][e[0]].alpha = 1.0;
-	});
-	grid.set(snake.seg, MINO_TYPE.EMPTY);
-	snake.cur_dir = 'right';
-	snake.set_pos(n_c);
-	grid.set(snake.seg, MINO_TYPE.SNAKE);
-	grid.set([snake.seg[0]], MINO_TYPE.HEAD_L);
-}
-
-function set_right_spwn() {
-	let n_c = [
-		[SIZE.W - 5, SPAWN_POS_Y],
-		[SIZE.W - 5 + 1, SPAWN_POS_Y],
-		[SIZE.W - 5 + 2, SPAWN_POS_Y]
-	]
-	_.each(snake.seg, (e)=>{
-		grid.sg[e[1]][e[0]].alpha = 1.0;
-	});
-	grid.set(snake.seg, MINO_TYPE.EMPTY);
-	snake.cur_dir = 'left';
-	snake.set_pos(n_c);
-	grid.set(snake.seg, MINO_TYPE.SNAKE);
-	grid.set([snake.seg[0]], MINO_TYPE.HEAD_R);
-	console.log(snake.cur_dir);
-}
-
-function anim_flashing_snake() {
-	snk_spwn_anm_alph = (snk_spwn_anm_alph + 0.09) % 1.0;
-	// There is code for time for snake is spawning
-	_.each(snake.seg, (e)=>{
-		grid.sg[e[1]][e[0]].alpha = snk_spwn_anm_alph;
-	});
-	// There is code for end of spawn
-	if (snk_spwn_time < game.time.now) {
-		_.each(snake.seg, (e)=>{
-			grid.sg[e[1]][e[0]].alpha = 1.0;
-		});
-		snake.alive = true;
-		snk_spwn_anm_alph = 0.0;
-		timer_anim.stop(true);
-		timer_anim.destroy();
-		timer_anim = null;
-	}
 }
 
 // TODO handle pause
@@ -114,8 +42,7 @@ states['game'] = {
 		let tick_time = 100;
 		clk = game.time.create(false);
 		clk.loop(tick_time, tick, this)
-
-		snake = new Snake(5, 5);
+		snake = new Snake(5, 2);
 		tetr = spawn_tetr();
 		clk.start();
 		// TODO uncomment when making fullscreen
@@ -126,6 +53,8 @@ states['game'] = {
 				game.scale.startFullScreen(false);
 			}
 		}, this);*/
+		snake_spawner = new SnakeSpawner(grid.g);
+		snake_spawner.spawn('left');
 		grid.add_callback('clear', () => {
 			fruit = [];
 			grid._cbs = {};
@@ -148,16 +77,14 @@ states['game'] = {
 				snake.set_dir('left');
 				console.log('snake left');
 			} else {
-				SPAWN_PALYER_CHOICE = 'left';
-				set_left_spwn();
+				snake_spawner.set_player_choice('left');
 			}
 		} if (input.p[0]['right'].justReleased) {
 			if (snake.alive) {
 				snake.set_dir('right');
 				console.log('snake right');
 			} else {
-				SPAWN_PALYER_CHOICE = 'right';
-				set_right_spwn();
+				snake_spawner.set_player_choice('right');
 			}
 		}
 		// For Tetris
@@ -267,20 +194,10 @@ function draw_snake() {
 						snake_d.push(snake.seg[k]);
 					}
 					//adding delay and spawn option
-					snk_spwn_time = game.time.now + snk_spwn_dl;
-					spawn_snake_at();
-					// draw in grid
-					grid.set(snake.seg, MINO_TYPE.SNAKE);
-					grid.set([snake.seg[0]], MINO_TYPE.HEAD_R);
-					// clear timer
-					if (timer_anim !== null) { timer_anim.destroy(); } 
-					// start new animation timer
-					timer_anim = game.time.create(false);
-					timer_anim.loop(snk_spwn_anim_dl, anim_flashing_snake, this);
-					timer_anim.start(0.0);
+					snake_spawner.spawn('left');
 					return;
-				} else { // Theris snake cut self
-					let it = -1;
+				} else { // Thereis snake cut self
+					/*let it = -1;
 					for(let k = 1; k < n_c.length; k++)
 						if (n_c[k][0] == n_c[0][0] &&
 							n_c[k][1] == n_c[0][1]) {
@@ -302,7 +219,7 @@ function draw_snake() {
 					}
 					// swap n_c
 					n_c = half_f;
-					}
+					}*/
 				}
 			} else { // snake eat it
 				// add new segment
@@ -368,7 +285,7 @@ function draw_snake_d() {
 function tick() {
 	// TODO snake goes here
 	if (ticks % SPEED.SNAKE == 0) {
-		if (snk_spwn_time < game.time.now) {
+		if (snake.alive) {
 			draw_snake();
 		} 
 	}
@@ -385,7 +302,7 @@ function tick() {
 
 	if (ticks % SPEED.FOOD == 0) {
 		// if snake isn't alive we aren't spawning fruit
-		if (timer_anim == null)
+		if (snake.alive)
 			spawn_fruit();
 	}
 
