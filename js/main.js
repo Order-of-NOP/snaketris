@@ -4,22 +4,21 @@ let input;
 let states = {};
 
 const SIZE = {H: 18, W: 24};
-// reltive speed values
+// relative speed values
+// TIP: less -> faster
 const SPEED = {
 	SNAKE: 2,
 	TETR_BOOST: 1,
 	TETR: 8,
 	FOOD: 48,
-	FRUIT_FALL: 8,
-	SNAKE_FALL: 1
+	//FOOD: 4,
+	FRUIT_FALL: 8
 }
 
-const DIR_HEAD = {
-	left: MINO_TYPE.HEAD_L,
-	right: MINO_TYPE.HEAD_R,
-	up: MINO_TYPE.HEAD_U,
-	down: MINO_TYPE.HEAD_D
-}
+const PL = {
+	SNAKE: 0,
+	TETR: 1
+};
 
 function init() {
 	const config = {
