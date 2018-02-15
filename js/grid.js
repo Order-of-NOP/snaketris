@@ -20,7 +20,8 @@ const MINO_TYPE = {
 	// dead snake
 	DEAD: 9,
 	// snake food
-	FRUIT: 10
+	FRUIT: 10,
+	// see draw snake in js/states/game.js
 };
 
 /**
@@ -158,7 +159,6 @@ class Grid {
 			this.sg[y][x].play(type.toString());
 		});
 	}
-
 	/**
 	 * Add a callback to be called after an event.
 	 * @params {number|string} evt - one of srtings: "clear"
