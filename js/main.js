@@ -11,6 +11,7 @@ const SPEED = {
 	TETR_BOOST: 1,
 	TETR: 8,
 	FOOD: 48,
+	SNAKE_FALL: 2,
 	//FOOD: 4,
 	FRUIT_FALL: 8
 }
