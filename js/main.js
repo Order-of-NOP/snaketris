@@ -15,6 +15,13 @@ const SPEED = {
 	FRUIT_FALL: 8
 }
 
+const DIR_HEAD = {
+	left: MINO_TYPE.HEAD_L,
+	right: MINO_TYPE.HEAD_R,
+	up: MINO_TYPE.HEAD_U,
+	down: MINO_TYPE.HEAD_D
+};
+
 const PL = {
 	SNAKE: 0,
 	TETR: 1
