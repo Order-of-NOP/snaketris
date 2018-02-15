@@ -156,7 +156,7 @@ function draw_fruit() {
 					}
 					if (stuck) _fruit.push([pos[0], pos[1] - 1]);
 				} break;
-				// Additional cases
+					// Additional cases
 				case MINO_TYPE.HEAD_U: snk_eat(res, i); break;
 				case MINO_TYPE.HEAD_L: snk_eat(res, i); break;
 				case MINO_TYPE.HEAD_R: snk_eat(res, i); break;
@@ -284,7 +284,7 @@ function tetr_rotate() {
 				// there is a collision w/ a blocker
 				if (_.intersection(
 					fc, blockers.concat([MINO_TYPE.FRUIT, MINO_TYPE.SNAKE]
-				)).length !== 0) {
+					)).length !== 0) {
 					grid.set([f], MINO_TYPE.EMPTY);
 					fruit.splice(f_idx, 1);
 					// TODO smash em fruit!
@@ -333,7 +333,7 @@ function tetr_shift() {
 				// there is a collision w/ a blocker
 				if (_.intersection(
 					fc, blockers.concat([MINO_TYPE.FRUIT, MINO_TYPE.SNAKE]
-				)).length !== 0) {
+					)).length !== 0) {
 					grid.set([f], MINO_TYPE.EMPTY);
 					fruit.splice(f_idx, 1);
 					// TODO smash em fruit!
@@ -345,6 +345,8 @@ function tetr_shift() {
 	grid.set(tetr.minos, MINO_TYPE.EMPTY);
 	tetr.set_pos(np);
 	grid.set(np, MINO_TYPE.ACTIVE);
+}
+
 // !!! WARNING
 // I have done collide with head only
 function draw_snake() {
@@ -377,22 +379,22 @@ function draw_snake() {
 								break;
 							}
 					if (it != -1) {
-					// get part alive snake
+						// get part alive snake
 					let half_f = n_c.splice(0, it);
-					// clear parts of snake
+						// clear parts of snake
 					let tail_d = [];
 					for(let k = snake.seg.length - 1; k > it-1; k-- ) {
 						tail_d.push(snake.seg[k]);
 					}
 					grid.set(tail_d, MINO_TYPE.EMPTY);
-					// push dead part of snake to snake_d
+						// push dead part of snake to snake_d
 					for(let k = 0; k < n_c.length; k++) {
 						snake_d.push(n_c[k]);
 					}
-					// swap n_c
+						// swap n_c
 					n_c = half_f;
 					}*/
-				}
+					}
 			} else { // snake eat it
 				// add new segment
 				let n = snake.seg.length - 1;
