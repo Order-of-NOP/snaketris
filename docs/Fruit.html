@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Input</title>
+    <title>JSDoc: Class: Fruit</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Input</h1>
+    <h1 class="page-title">Class: Fruit</h1>
 
     
 
@@ -28,10 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Input<span class="signature">()</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Fruit<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Input manager that doesn't mind to be used with pads. Translates controller
-actions (e.g. KeyCode.W) into terms of gameplay actions (e.g. player1.jump).</div>
+            <div class="class-description">Represents a fruit.</div>
         
     
 </header>
@@ -46,16 +45,12 @@ actions (e.g. KeyCode.W) into terms of gameplay actions (e.g. player1.jump).</di
     
 
     
-    <h4 class="name" id="Input"><span class="type-signature"></span>new Input<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Fruit"><span class="type-signature"></span>new Fruit<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
 
 
-
-<div class="description">
-    To be called on game create. Uses Phaser's game.input objects.
-</div>
 
 
 
@@ -98,7 +93,7 @@ actions (e.g. KeyCode.W) into terms of gameplay actions (e.g. player1.jump).</di
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="input.js.html">input.js</a>, <a href="input.js.html#line19">line 19</a>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line17">line 17</a>
     </li></ul></dd>
     
 
@@ -146,15 +141,13 @@ actions (e.g. KeyCode.W) into terms of gameplay actions (e.g. player1.jump).</di
 
         
             
-<h4 class="name" id="p"><span class="type-signature"></span>p<span class="type-signature"> :list</span></h4>
+<h4 class="name" id="x"><span class="type-signature"></span>x<span class="type-signature"> :number</span></h4>
 
 
 
 
 <div class="description">
-    Action container for players. p[0] is for player one, p[1] - for
-player 2, etc. Members contain hash-map with action names as keys
-and <a href="Key.html">Key</a> objects as values.
+    x coordinate of the Fruit.
 </div>
 
 
@@ -163,7 +156,7 @@ and <a href="Key.html">Key</a> objects as values.
     <ul>
         <li>
             
-<span class="param-type">list</span>
+<span class="param-type">number</span>
 
 
         </li>
@@ -202,7 +195,7 @@ and <a href="Key.html">Key</a> objects as values.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="input.js.html">input.js</a>, <a href="input.js.html#line32">line 32</a>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line34">line 34</a>
     </li></ul></dd>
     
 
@@ -220,13 +213,13 @@ and <a href="Key.html">Key</a> objects as values.
 
         
             
-<h4 class="name" id="pads_supported"><span class="type-signature">(readonly) </span>pads_supported<span class="type-signature"> :boolean</span></h4>
+<h4 class="name" id="y"><span class="type-signature"></span>y<span class="type-signature"> :number</span></h4>
 
 
 
 
 <div class="description">
-    Returns true when the browser supports gamepad input.
+    y coordinate of the Fruit
 </div>
 
 
@@ -235,7 +228,7 @@ and <a href="Key.html">Key</a> objects as values.
     <ul>
         <li>
             
-<span class="param-type">boolean</span>
+<span class="param-type">number</span>
 
 
         </li>
@@ -274,7 +267,7 @@ and <a href="Key.html">Key</a> objects as values.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="input.js.html">input.js</a>, <a href="input.js.html#line50">line 50</a>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line36">line 36</a>
     </li></ul></dd>
     
 
@@ -302,185 +295,7 @@ and <a href="Key.html">Key</a> objects as values.
     
 
     
-    <h4 class="name" id="reset"><span class="type-signature"></span>reset<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="input.js.html">input.js</a>, <a href="input.js.html#line201">line 201</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-    <dt class="tag-todo">To Do:</dt>
-    <dd class="tag-todo">
-        <ul>
-            <li>remove the layout info from localStorage and restore defaults</li>
-        </ul>
-    </dd>
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="restore"><span class="type-signature"></span>restore<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="input.js.html">input.js</a>, <a href="input.js.html#line159">line 159</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-    <dt class="tag-todo">To Do:</dt>
-    <dd class="tag-todo">
-        <ul>
-            <li>load the layout from localStorage</li>
-        </ul>
-    </dd>
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="destroy"><span class="type-signature"></span>destroy<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -488,7 +303,7 @@ and <a href="Key.html">Key</a> objects as values.
 
 
 <div class="description">
-    Saves current bindings into a localStorage.
+    Removes the fruit from a list of fruit.
 </div>
 
 
@@ -532,7 +347,7 @@ and <a href="Key.html">Key</a> objects as values.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="input.js.html">input.js</a>, <a href="input.js.html#line111">line 111</a>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line158">line 158</a>
     </li></ul></dd>
     
 
@@ -566,7 +381,7 @@ and <a href="Key.html">Key</a> objects as values.
     
 
     
-    <h4 class="name" id="setup"><span class="type-signature"></span>setup<span class="signature">(player, key_name)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">(dir, pwr)</span><span class="type-signature"></span></h4>
     
 
     
@@ -574,8 +389,8 @@ and <a href="Key.html">Key</a> objects as values.
 
 
 <div class="description">
-    A procedure for key binding. Press a key on any controller after this
-function is called to bind it to the specified action.
+    Move a fruit to a given direction. This handles all the collisions and
+<a href="Fruit.html#destroy">destroys</a> it when squashed.
 </div>
 
 
@@ -611,31 +426,7 @@ function is called to bind it to the specified action.
 
         <tr>
             
-                <td class="name"><code>player</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">an id of a player (an index from
-<a href="Input.html#p">p</a>)</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>key_name</code></td>
+                <td class="name"><code>dir</code></td>
             
 
             <td class="type">
@@ -651,7 +442,30 @@ function is called to bind it to the specified action.
 
             
 
-            <td class="description last">an action name (a key from p[player])</td>
+            <td class="description last">'left', 'right', 'up' of 'down'</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pwr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">use an alternative behavour on vertical moves</td>
         </tr>
 
     
@@ -692,7 +506,230 @@ function is called to bind it to the specified action.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="input.js.html">input.js</a>, <a href="input.js.html#line60">line 60</a>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line67">line 67</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="spawn"><span class="type-signature"></span>spawn<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Spawn a fruit in an apropriate position of a <a href="Grid.html">Grid</a>. Adds it
+to a fruit list.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line43">line 43</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="stack"><span class="type-signature"></span>stack<span class="signature">(up)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    For a vertical stack of fruit objects this function tests, what it ends
+with. By default it checks below the Fruit.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>up</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">set to true to check above the fruit</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line147">line 147</a>
     </li></ul></dd>
     
 

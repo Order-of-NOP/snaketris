@@ -6,8 +6,6 @@ let snake;
 let tetr;
 // active fruit
 let fruit = [];
-// fruit that was moved by Tetr in the current tick
-let ttf = [];
 // dead snake 
 let snake_d = [];
 let snake_spawner = null;
@@ -15,24 +13,6 @@ let snake_spawner = null;
 function spawn_tetr() {
 	// TODO check collisions w/ snake and fruit
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
-}
-
-function spawn_fruit() {
-	let xs, y;
-	/* loop through all the lines seeking for an empty space */
-	for (y = 0; y < SIZE.H; ++y) {
-		xs = _.filter(_.range(SIZE.W), (x) => {
-			return grid.collide([[x, y]]).length === 0;
-		});
-		if (xs.length > 0) break;
-	}
-	if (y === SIZE.H) {
-		console.warn('Whoa! No place for fruit!');
-		return;
-	}
-	let pos = [_.sample(xs), y];
-	grid.set([pos], MINO_TYPE.FRUIT);
-	fruit.push(pos);
 }
 
 // TODO handle pause
@@ -106,85 +86,16 @@ states['game'] = {
 }
 
 function draw_fruit() {
-	// return previous position
-	let ret_pos = (l,p) => { l.push([p[0], p[1] - 1]); };
-	// send fruit to static
-	let to_static = (l,p,r,i) => { l.push([p[0], p[1]]); r.splice(i,1); i--; };
-	// snake eat fall fruit
-	let snk_eat = (r,i) => { r.splice(i,1); i--; snake.push_seg(); }
-	// static active fruit (need for collision between fruit)
-	let fruit_s = [];
-	// create list of new coords
-	let n_c = _.map(fruit, (e) => { return [e[0], e[1] + 1] });
-	// get collisions
-	var res = grid.collide(n_c);
-	// collided indices
-	let ids = _.unzip(res);
-	ids = ids.length == 0 ? [] : ids[1];
-	// get normal fruit
-	let _fruit = _.filter(fruit, (e, i) => { return !ids.includes(i); });
-	// resolve collisions
-	for (var i = 0; i < res.length; i++) {
-		let pos = fruit[res[i][1]];
-		// There is reslolve collisions with floor
-		// TODO handle wall collisions when is pushed by Tetr
-		if (res[i][0] == 'floor') {
-			to_static(fruit_s, pos, res, i);
+	for (let i = 0; i < fruit.length; ++i) {
+		if (fruit[i].grav) {
+			fruit[i].move('down');
 		} else {
-			// There is resolve collisions with minos 
-			switch(res[i][0]) {
-				case MINO_TYPE.SNAKE: ret_pos(_fruit, pos); break;
-				case MINO_TYPE.ACTIVE: ret_pos(_fruit, pos); break;
-				case MINO_TYPE.STILL: to_static(fruit_s, pos, res, i); break;
-				case MINO_TYPE.HEAVY: to_static(fruit_s, pos, res, i); break;
-				case MINO_TYPE.DEAD: to_static(fruit_s, pos, res, i); break;
-				case MINO_TYPE.FRUIT: {
-					// TODO too complex. Can be made simple
-					// этот код позволяет фруктам не блокировать друг друга при
-					// падении. Код сканирует столбец грида вниз начиная с pos,
-					// пока не наткнётся на что-то, кроме фрукта
-					let stuck = true;
-					for (let y = pos[1]+1; i < SIZE.H; ++y) {
-						let t = grid.collide([[pos[0], y]]);
-						if (t.length === 0) {
-							_fruit.push([pos[0], pos[1]]);
-							stuck = false;
-							break;
-						}
-						else if (t[0][0] === MINO_TYPE.FRUIT) continue;
-						else break;
-					}
-					if (stuck) _fruit.push([pos[0], pos[1] - 1]);
-				} break;
-					// Additional cases
-				case MINO_TYPE.HEAD_U: snk_eat(res, i); break;
-				case MINO_TYPE.HEAD_L: snk_eat(res, i); break;
-				case MINO_TYPE.HEAD_R: snk_eat(res, i); break;
-				case MINO_TYPE.HEAD_D: snk_eat(res, i); break;
-			}
+			fruit[i].grav = true;
 		}
 	}
-	// clear
-	grid.set(fruit, MINO_TYPE.EMPTY);
-	// switch previous pos
-	fruit = _fruit;
-	// move movable fruit
-	_.each(fruit, (e) => { e[1]++; });
-	// draw fruit
-	grid.set(fruit, MINO_TYPE.FRUIT);
-	// draw current iteration's static fruit
-	if (fruit_s.length > 0) {
-		grid.set(fruit_s, MINO_TYPE.HEAVY);
-	}
-	// TODO food Snake with some fruit!
 }
 
-// TODO возможно исчезание фруктов, проверить этот кейс позже
-// TODO fruit to snake's head collides need some careful handling
-function tetr_fall() {
-	// return threaten fruit. Maybe to take it back later
-	fruit = fruit.concat(ttf);
-	ttf = [];
+function tetr_fall(pwr) {
 	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
 		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
 	let blockers = ['floor', MINO_TYPE.STILL, MINO_TYPE.HEAVY, MINO_TYPE.DEAD];
@@ -205,23 +116,10 @@ function tetr_fall() {
 			// TODO collide w/ snake
 		}
 		if (c === MINO_TYPE.FRUIT) {
-			let f = np[n];
-			let find_f = (el) => { return el[0] === f[0] && el[1] === f[1]; };
-			// stop tracking gravity on this fruit
-			let f_idx = _.findIndex(fruit, find_f);
-			if (f_idx >= 0) {
-				fruit.splice(f_idx, 1);
-				grid.set([f], MINO_TYPE.EMPTY);
-			}
-			f = [f[0], f[1] + 1];
-			let fc = grid.collide([f]);
-			if (fc.length === 0) {
-				grid.set([f], MINO_TYPE.FRUIT);
-				ttf.push(f);
-			} else {
-				// smash the fruit!
-				// TODO play an animation
-			}
+			let [fx, fy] = np[n];
+			let f = fruit_find(fx, fy);
+			f.grav = false;
+			f.move('down', snake_body.includes(f.stack()) || pwr);
 		}
 	}
 	// the way is free
@@ -250,14 +148,12 @@ function tetr_rotate() {
 			// TODO interact w/ snake
 		}
 		if (c === MINO_TYPE.FRUIT) {
-			let f = np[n];
-			let f_idx = _.findIndex(fruit, (el) => {
-				return el[0] === f[0] && el[1] === f[1];
-			});
+			let [fx, fy] = np[n];
+			let f = fruit_find(fx, fy);
 			/* tetr's center is the first mino */
 			let ctr = tetr.minos[0];
 			/* fruit coord relative to tetr's center */
-			let f_ = [f[0] - ctr[0], f[1] - ctr[1]];
+			let f_ = [fx - ctr[0], fy - ctr[1]];
 			/* delta fruit's pos */
 			let mv;
 			/* rotate clockwise */
@@ -265,31 +161,24 @@ function tetr_rotate() {
 			if (f_[0] <= 0 && f_[1] > 0) mv = [-1,  0];
 			if (f_[0] < 0 && f_[1] <= 0) mv = [ 0, -1];
 			if (f_[0] >= 0 && f_[1] < 0) mv = [ 1,  0];
-			let nf = [f[0] + mv[0], f[1] + mv[1]];
+			let nf = [fx + mv[0], fy + mv[1]];
 			/* move out of tetr */
 			while (_.find(np, (el) => {
 				return el[0] === nf[0] && el[1] === nf[1];
 			}) !== undefined) {
 				mv = [mv[0] === 0 ? 0 : mv[0] + 1, mv[1] === 0 ? 0 : mv[1]];
-				nf = [f[0] + mv[0], f[1] + mv[1]];
+				nf = [fx + mv[0], fy + mv[1]];
 			}
-			/* check collisions */
-			let fc = grid.collide([nf]);
-			if (fc.length === 0) {
-				grid.set([f], MINO_TYPE.EMPTY);
-				fruit[f_idx] = nf;
-				grid.set([nf], MINO_TYPE.FRUIT);
-			} else {
-				fc = _.unzip(fc)[0];
-				// there is a collision w/ a blocker
-				if (_.intersection(
-					fc, blockers.concat([MINO_TYPE.FRUIT, MINO_TYPE.SNAKE]
-					)).length !== 0) {
-					grid.set([f], MINO_TYPE.EMPTY);
-					fruit.splice(f_idx, 1);
-					// TODO smash em fruit!
+			/* now move (collision-proof!) */
+			while (mv[0] !== 0 || mv[1] !== 0) {
+				if (mv[0] !== 0) {
+					f.move(mv[0] < 0 ? 'left' : 'right', true);
+					mv[0] += mv[0] < 0 ? 1 : -1;
 				}
-				// TODO unhandled snake head collision
+				if (mv[1] !== 0) {
+					f.move(mv[1] < 0 ? 'up' : 'down', true);
+					mv[1] += mv[1] < 0 ? 1 : -1;
+				}
 			}
 		}
 	}
@@ -300,7 +189,7 @@ function tetr_rotate() {
 }
 
 function tetr_shift() {
-	if (tetr.x_dir === X_DIR.NONE) return false;
+	if (tetr.x_dir === X_DIR.NONE) return;
 	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
 		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
 	let blockers = ['wall', 'floor', MINO_TYPE.STILL, MINO_TYPE.HEAVY,
@@ -316,30 +205,9 @@ function tetr_shift() {
 			// TODO interact w/ snake
 		}
 		if (c === MINO_TYPE.FRUIT) {
-			let f = np[n];
-			let f_idx = _.findIndex(fruit, (el) => {
-				return el[0] === f[0] && el[1] === f[1];
-			});
-			/* the new fruit's position */
-			let nf = [f[0] + (tetr.x_dir === X_DIR.LEFT ? -1 : 1), f[1]];
-			let fc = grid.collide([nf]);
-			// TODO fruit to snake's head collides need some careful handling
-			if (fc.length === 0) {
-				grid.set([f], MINO_TYPE.EMPTY);
-				fruit[f_idx] = nf;
-				grid.set([nf], MINO_TYPE.FRUIT);
-			} else {
-				fc = _.unzip(fc)[0];
-				// there is a collision w/ a blocker
-				if (_.intersection(
-					fc, blockers.concat([MINO_TYPE.FRUIT, MINO_TYPE.SNAKE]
-					)).length !== 0) {
-					grid.set([f], MINO_TYPE.EMPTY);
-					fruit.splice(f_idx, 1);
-					// TODO smash em fruit!
-				}
-				// TODO unhandled snake head collision
-			}
+			let [fx, fy] = np[n];
+			let f = fruit_find(fx, fy);
+			f.move(tetr.x_dir === X_DIR.LEFT ? 'left' : 'right');
 		}
 	}
 	grid.set(tetr.minos, MINO_TYPE.EMPTY);
@@ -352,7 +220,7 @@ function tetr_shift() {
 function draw_snake() {
 	// get new coord
 	let n_c = snake.move();
-	// get collisions with gead only!!!
+	// get collisions with head only!!!
 	let res = grid.collide([n_c[0]]);
 	// resolve collisions
 	for(let i = 0; i < res.length; i++) {
@@ -400,15 +268,7 @@ function draw_snake() {
 				let n = snake.seg.length - 1;
 				n_c.push([snake.seg[n][0], snake.seg[n][1]])
 				// find fruit with this position and pop it
-				for(let k = 0; k < fruit.length; k++) {
-					if (fruit[k][0] == n_c[0][0] && fruit[k][1] == n_c[0][1]) {
-						// pop elem
-						fruit.splice(k, 1);
-						// clean map
-						grid.set([[n_c[0][0], n_c[0][1]]], MINO_TYPE.EMPTY);
-						break;
-					}
-				}
+				fruit_find(n_c[0][0], n_c[0][1]).destroy();
 			}
 		} 
 	}
@@ -458,7 +318,7 @@ function tick() {
 		tetr_shift();
 	}
 	if (ticks % (tetr.boost ? SPEED.TETR_BOOST : SPEED.TETR) === 0) {
-		tetr_fall();
+		tetr_fall(tetr.boost);
 	}
 	if (ticks % SPEED.SNAKE == 0) {
 		if (snake.alive) {
@@ -476,7 +336,8 @@ function tick() {
 	}
 
 	if (ticks % SPEED.FOOD === 0) {
-		spawn_fruit();
+		let f = new Fruit();
+		f.spawn();
 	}
 
 	// Don't remove
