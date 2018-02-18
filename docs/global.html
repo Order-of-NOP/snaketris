@@ -161,6 +161,78 @@ animation codes.
 
         
             
+<h4 class="name" id="Position"><span class="type-signature"></span>Position<span class="type-signature"> :list</span></h4>
+
+
+
+
+<div class="description">
+    of a fruit in <a href="Grid.html">Grid</a>.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">list</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line20">line 20</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="TILE_SIZE"><span class="type-signature">(constant) </span>TILE_SIZE<span class="type-signature"> :number</span></h4>
 
 
@@ -215,7 +287,81 @@ animation codes.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line30">line 30</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="Turn"><span class="type-signature"></span>Turn<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    to false when do not need gravitation to be applied this
+tick. Will be switched back by
+draw_fruit.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line25">line 25</a>
     </li></ul></dd>
     
 
@@ -235,6 +381,194 @@ animation codes.
     
 
     
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fruit_find"><span class="type-signature"></span>fruit_find<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="Fruit.html">Fruit</a>|undefined}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Find a <a href="Fruit.html">Fruit</a> with given position in a [fruit]{@link} list.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">x coordinate</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">y coordinate</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fruit.js.html">fruit.js</a>, <a href="fruit.js.html#line8">line 8</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    a Fruit on [x, y] position. If there's no such
+fruit, returns undefined
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Fruit.html">Fruit</a></span>
+|
+
+<span class="param-type">undefined</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
 
     
 
@@ -249,13 +583,13 @@ animation codes.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Grid.html">Grid</a></li><li><a href="Input.html">Input</a></li><li><a href="Key.html">Key</a></li><li><a href="Mino.html">Mino</a></li></ul><h3>Global</h3><ul><li><a href="global.html#MINO_TYPE">MINO_TYPE</a></li><li><a href="global.html#TILE_SIZE">TILE_SIZE</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Fruit.html">Fruit</a></li><li><a href="Grid.html">Grid</a></li><li><a href="Input.html">Input</a></li><li><a href="Key.html">Key</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fruit_find">fruit_find</a></li><li><a href="global.html#MINO_TYPE">MINO_TYPE</a></li><li><a href="global.html#Position">Position</a></li><li><a href="global.html#TILE_SIZE">TILE_SIZE</a></li><li><a href="global.html#Turn">Turn</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Feb 03 2018 00:12:14 GMT+0700 (+07)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Feb 18 2018 21:29:30 GMT+0700 (+07)
 </footer>
 
 <script> prettyPrint(); </script>

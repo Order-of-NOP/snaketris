@@ -170,7 +170,7 @@ number, representing it's type.</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line36">line 36</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line37">line 37</a>
     </li></ul></dd>
     
 
@@ -215,6 +215,68 @@ number, representing it's type.</div>
 
     
         <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="_cbs"><span class="type-signature"></span>_cbs<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    A hash-map of lists of callbacks with MINO_TYPE.toString() as keys.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line71">line 71</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
 
         
             
@@ -274,7 +336,7 @@ mechanics.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line59">line 59</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -346,7 +408,7 @@ mechanics.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line52">line 52</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -419,7 +481,7 @@ is shown. Consists of sprite objects with animations set up.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line65">line 65</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line66">line 66</a>
     </li></ul></dd>
     
 
@@ -491,7 +553,7 @@ is shown. Consists of sprite objects with animations set up.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line47">line 47</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line48">line 48</a>
     </li></ul></dd>
     
 
@@ -512,6 +574,92 @@ is shown. Consists of sprite objects with animations set up.
 
     
         <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="add_callback"><span class="type-signature"></span>add_callback<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Add a callback to be called after an event.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line168">line 168</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
             
@@ -572,7 +720,7 @@ EMPTY. Use it when starting a new game.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line85">line 85</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line91">line 91</a>
     </li></ul></dd>
     
 
@@ -708,7 +856,7 @@ EMPTY.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line104">line 104</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line114">line 114</a>
     </li></ul></dd>
     
 
@@ -764,6 +912,141 @@ tuple [cause, id], where id is the number of `li` member collided,
     
     <pre class="prettyprint"><code>// coordinates are passed as [x, y]
 grid.collide([[0,0], [0,1], [0,2], [1,2]]);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="rm_callbacks"><span class="type-signature"></span>rm_callbacks<span class="signature">(evt)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Remove all the callbacks for a specified event.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>evt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">an event for callbacks to be deleted</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line189">line 189</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -898,7 +1181,7 @@ passed as [x,y].
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line139">line 139</a>
+        <a href="grid.js.html">grid.js</a>, <a href="grid.js.html#line149">line 149</a>
     </li></ul></dd>
     
 
@@ -942,13 +1225,13 @@ passed as [x,y].
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Grid.html">Grid</a></li><li><a href="Input.html">Input</a></li><li><a href="Key.html">Key</a></li><li><a href="Mino.html">Mino</a></li></ul><h3>Global</h3><ul><li><a href="global.html#MINO_TYPE">MINO_TYPE</a></li><li><a href="global.html#TILE_SIZE">TILE_SIZE</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Fruit.html">Fruit</a></li><li><a href="Grid.html">Grid</a></li><li><a href="Input.html">Input</a></li><li><a href="Key.html">Key</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fruit_find">fruit_find</a></li><li><a href="global.html#MINO_TYPE">MINO_TYPE</a></li><li><a href="global.html#Position">Position</a></li><li><a href="global.html#TILE_SIZE">TILE_SIZE</a></li><li><a href="global.html#Turn">Turn</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Feb 03 2018 00:12:14 GMT+0700 (+07)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Feb 18 2018 21:29:30 GMT+0700 (+07)
 </footer>
 
 <script> prettyPrint(); </script>
