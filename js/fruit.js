@@ -34,9 +34,10 @@ class Fruit
 	}
 	move(dir, pwr) {
 		let blockers = [MINO_TYPE.DEAD, MINO_TYPE.STILL, MINO_TYPE.HEAVY];
-		if (dir === 'down') {
-			let [x, y] = [this.x, this.y + 1];
-			let cs = grid.collide([[x,y]]);
+		pwr = dir === 'up' || pwr;
+		if (dir === 'down' || dir === 'up') {
+			let [x, y] = [this.x, this.y + (dir === 'up' ? -1 : 1)];
+			let cs = grid.collide([[x, y]]);
 			/* free to go */
 			if (cs.length === 0 || cs[0][0] === MINO_TYPE.ACTIVE) {
 				grid.set([this.p], MINO_TYPE.EMPTY);
@@ -45,7 +46,7 @@ class Fruit
 				return;
 			}
 			let c = cs[0][0];
-			if (blockers.includes(c) || c === 'floor') {
+			if (blockers.concat('floor', 'ceil').includes(c)) {
 				if (!!pwr) {
 					// TODO smash this fruit!
 					grid.set([this.p], MINO_TYPE.EMPTY);
@@ -57,7 +58,7 @@ class Fruit
 				return;
 			}
 			if (c === MINO_TYPE.FRUIT) {
-				let btm = this.stack;
+				let btm = this.stack(dir === 'up');
 				if (btm === MINO_TYPE.EMPTY) {
 					let f = fruit_find(x, y);
 					f.grav = false;
@@ -89,7 +90,7 @@ class Fruit
 				return;
 			}
 			let c = cs[0][0];
-			if (blockers.includes(c.concat(['wall', MINO_TYPE.SNAKE]))) {
+			if (blockers.concat(['wall', MINO_TYPE.SNAKE]).includes(c)) {
 				// TODO smash this fruit!
 				grid.set([this.p], MINO_TYPE.EMPTY);
 				this.destroy();
@@ -106,12 +107,13 @@ class Fruit
 			}
 		}
 	}
-	get stack() {
-		let abv = grid.collide([[this.p[0], this.p[1] + 1]]);
+	stack(up) {
+		let p = [this.p[0], this.p[1] + (!!up ? -1 : 1)];
+		let abv = grid.collide([p]);
 		if (abv.length === 0) return MINO_TYPE.EMPTY;
 		if (abv[0][0] === MINO_TYPE.FRUIT) {
-			let f = fruit_find(this.p[0], this.p[1] + 1);
-			return f.stack;
+			let f = fruit_find(p[0], p[1]);
+			return f.stack(up);
 		}
 		return abv[0][0];
 	}
