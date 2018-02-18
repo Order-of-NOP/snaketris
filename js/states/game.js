@@ -220,7 +220,7 @@ function tetr_shift() {
 function draw_snake() {
 	// get new coord
 	let n_c = snake.move();
-	// get collisions with gead only!!!
+	// get collisions with head only!!!
 	let res = grid.collide([n_c[0]]);
 	// resolve collisions
 	for(let i = 0; i < res.length; i++) {
@@ -268,15 +268,7 @@ function draw_snake() {
 				let n = snake.seg.length - 1;
 				n_c.push([snake.seg[n][0], snake.seg[n][1]])
 				// find fruit with this position and pop it
-				for(let k = 0; k < fruit.length; k++) {
-					if (fruit[k][0] == n_c[0][0] && fruit[k][1] == n_c[0][1]) {
-						// pop elem
-						fruit.splice(k, 1);
-						// clean map
-						grid.set([[n_c[0][0], n_c[0][1]]], MINO_TYPE.EMPTY);
-						break;
-					}
-				}
+				fruit_find(n_c[0][0], n_c[0][1]).destroy();
 			}
 		} 
 	}
@@ -328,15 +320,15 @@ function tick() {
 	if (ticks % (tetr.boost ? SPEED.TETR_BOOST : SPEED.TETR) === 0) {
 		tetr_fall(tetr.boost);
 	}
-	//if (ticks % SPEED.SNAKE == 0) {
-		//if (snake.alive) {
-			//draw_snake();
-		//} 
-	//}
-	//// draw snake segments
-	//if (ticks % SPEED.SNAKE_FALL == 0) {
-		//draw_snake_d();
-	//}
+	if (ticks % SPEED.SNAKE == 0) {
+		if (snake.alive) {
+			draw_snake();
+		} 
+	}
+	// draw snake segments
+	if (ticks % SPEED.SNAKE_FALL == 0) {
+		draw_snake_d();
+	}
 	// Actions with fruit (draw, collisions e.t.c)
 	// NOTE: always draw fruit before spawning another one
 	if (ticks % SPEED.FRUIT_FALL === 0) {
