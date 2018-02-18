@@ -11,6 +11,7 @@ states['preload'] = {
 			= function() { return false; };
 		input = new Input();
 		game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
+		game.stage.backgroundColor = '#1f6b75';
 		//game.state.start('menu');
 		game.state.start('game');
 	}

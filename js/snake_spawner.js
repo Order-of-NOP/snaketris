@@ -118,9 +118,21 @@ class SnakeSpawner {
     timer_loop() {
         this.animation.alpha = (this.animation.alpha + this.animation.flash_dx) % 1;
         this.sprite.alpha = this.animation.alpha;
-        let pos = this.coords[this._spawn.player_choice][1];
-        this.sprite.x = pos[0]*TILE_SIZE;
-        this.sprite.y = pos[1]*TILE_SIZE;
+        let pos = null;
+        
+        if (this._spawn.player_choice === 'left') {
+            pos = this.coords[this._spawn.player_choice][2];
+        } else if (this._spawn.player_choice === 'right') {
+            pos = this.coords[this._spawn.player_choice][0];
+        }
+
+        if (pos == null) {
+            console.warn('Error: pos = null');
+        } else {
+            this.sprite.x = pos[0]*TILE_SIZE;
+            this.sprite.y = pos[1]*TILE_SIZE;
+        }
+        
         if (this._spawn.player_confirms === this._spawn.max_pushs_confirms) {
             this.stop();
         }
