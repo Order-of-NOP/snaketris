@@ -9,10 +9,12 @@ const SIZE = {H: 18, W: 24};
 const SPEED = {
 	SNAKE: 2,
 	TETR_BOOST: 1,
+	TETR_ROTATE: 1,
+	TETR_SHIFT: 2,
 	TETR: 8,
 	FOOD: 48,
-	SNAKE_FALL: 2,
-	//FOOD: 4,
+	SNAKE_FALL: 1,
+	// must be = TETR
 	FRUIT_FALL: 8
 }
 
@@ -36,7 +38,7 @@ function init() {
 		parent: 'game',
 		antialias: true,
 		multiTexture: true,
-		//,transparent: true
+		transparent: true
 	};
 	game = new Phaser.Game(config);
 	for (let s in states) {

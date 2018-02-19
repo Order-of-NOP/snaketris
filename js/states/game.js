@@ -217,6 +217,7 @@ function tetr_shift() {
 
 // !!! WARNING
 // I have done collide with head only
+// TODO cut Snake w/ Tetr
 function draw_snake() {
 	// get new coord
 	let n_c = snake.move();
@@ -224,8 +225,7 @@ function draw_snake() {
 	let res = grid.collide([n_c[0]]);
 	// resolve collisions
 	for(let i = 0; i < res.length; i++) {
-		let ind = res[i][1];
-		let type = res[i][0];
+		let [type, ind] = res[i];
 		// if head of snake collide
 		if (ind === 0) {
 			if (type != MINO_TYPE.FRUIT) {
@@ -262,7 +262,7 @@ function draw_snake() {
 						// swap n_c
 					n_c = half_f;
 					}*/
-					}
+				}
 			} else { // snake eat it
 				// add new segment
 				let n = snake.seg.length - 1;
@@ -313,10 +313,8 @@ function draw_snake_d() {
 function tick() {
 	// TODO snake goes here
 	// tetr goes here
-	if (ticks % SPEED.TETR_BOOST === 0) {
-		tetr_rotate();
-		tetr_shift();
-	}
+	if (ticks % SPEED.TETR_ROTATE === 0) tetr_rotate();
+	if (ticks % SPEED.TETR_SHIFT === 0) tetr_shift();
 	if (ticks % (tetr.boost ? SPEED.TETR_BOOST : SPEED.TETR) === 0) {
 		tetr_fall(tetr.boost);
 	}
