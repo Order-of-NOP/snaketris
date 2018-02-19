@@ -54,24 +54,20 @@ states['game'] = {
 		if (input.p[0]['down'].justReleased) {
 			if (snake.alive) {
 				snake.set_dir('down');
-				console.log('snake down');
 			}
 		} else if (input.p[0]['up'].justReleased) {
 			if (snake.alive) {
 				snake.set_dir('up');
-				console.log('snake up');
 			}
 		} else if (input.p[0]['left'].justReleased) {
 			if (snake.alive) {
 				snake.set_dir('left');
-				console.log('snake left');
 			} else {
 				snake_spawner.set_player_choice('left');
 			}
 		} if (input.p[0]['right'].justReleased) {
 			if (snake.alive) {
 				snake.set_dir('right');
-				console.log('snake right');
 			} else {
 				snake_spawner.set_player_choice('right');
 			}
@@ -113,7 +109,7 @@ function tetr_fall(pwr) {
 			return;
 		}
 		if (snake_body.indexOf(c) >= 0) {
-			// TODO collide w/ snake
+			snake.cut_on_tetr();
 		}
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
@@ -145,7 +141,7 @@ function tetr_rotate() {
 			return;
 		}
 		if (snake_body.indexOf(c) >= 0) {
-			// TODO interact w/ snake
+			snake.cut_on_tetr();
 		}
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
@@ -202,7 +198,7 @@ function tetr_shift() {
 		let [c, n] = cs[i];
 		if (blockers.indexOf(c) >= 0) return;
 		if (snake_body.indexOf(c) >= 0) {
-			// TODO interact w/ snake
+			snake.cut_on_tetr();
 		}
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
@@ -220,68 +216,43 @@ function tetr_shift() {
 // TODO cut Snake w/ Tetr
 function draw_snake() {
 	// get new coord
-	let n_c = snake.move();
-	// get collisions with head only!!!
-	let res = grid.collide([n_c[0]]);
+	let np = snake.move();
+	let res = grid.collide(np);
 	// resolve collisions
-	for(let i = 0; i < res.length; i++) {
-		let [type, ind] = res[i];
-		// if head of snake collide
-		if (ind === 0) {
-			if (type != MINO_TYPE.FRUIT) {
-				// Without this if snake can kill self
-				if (type != MINO_TYPE.SNAKE) {
-					grid.set(snake.seg, MINO_TYPE.EMPTY);
-					for(let k = 0; k < snake.seg.length; k++) {
-						snake_d.push(snake.seg[k]);
-					}
-					//adding delay and spawn option
-					snake_spawner.spawn('left');
-					return;
-				} else { // Thereis snake cut self
-					/*let it = -1;
-					for(let k = 1; k < n_c.length; k++)
-						if (n_c[k][0] == n_c[0][0] &&
-							n_c[k][1] == n_c[0][1]) {
-								it = k;
-								break;
-							}
-					if (it != -1) {
-						// get part alive snake
-					let half_f = n_c.splice(0, it);
-						// clear parts of snake
-					let tail_d = [];
-					for(let k = snake.seg.length - 1; k > it-1; k-- ) {
-						tail_d.push(snake.seg[k]);
-					}
-					grid.set(tail_d, MINO_TYPE.EMPTY);
-						// push dead part of snake to snake_d
-					for(let k = 0; k < n_c.length; k++) {
-						snake_d.push(n_c[k]);
-					}
-						// swap n_c
-					n_c = half_f;
-					}*/
-				}
-			} else { // snake eat it
-				// add new segment
-				let n = snake.seg.length - 1;
-				n_c.push([snake.seg[n][0], snake.seg[n][1]])
-				// find fruit with this position and pop it
-				fruit_find(n_c[0][0], n_c[0][1]).destroy();
-			}
-		} 
+	for (let i = 0; i < res.length; i++) {
+		let [c, n] = res[i];
+		if (n === 0 && c === MINO_TYPE.FRUIT) {
+			// add new segment
+			let n = snake.seg.length - 1;
+			np.push([snake.seg[n][0], snake.seg[n][1]])
+			// find fruit with this position and pop it
+			fruit_find(np[0][0], np[0][1]).destroy();
+		}
+		if (n === 0 && ![MINO_TYPE.SNAKE, MINO_TYPE.FRUIT].includes(c)) {
+			// die, mah-fukker, die!
+			grid.set(snake.seg, MINO_TYPE.EMPTY);
+			snake_d = snake_d.concat(snake.seg);
+			//adding delay and spawn option
+			snake_spawner.spawn('left');
+			return;
+		}
+		if (c === MINO_TYPE.ACTIVE) {
+			let skin = snake.cut(n);
+			grid.set(skin, MINO_TYPE.EMPTY);
+			snake_d = snake_d.concat(skin);
+			np.splice(n);
+			break;
+		}
 	}
-
-	let h = n_c[0];
+	let h = np[0];
 	// clear
 	grid.set(snake.seg, MINO_TYPE.EMPTY);
 	// draw head
-	grid.set(n_c, MINO_TYPE.SNAKE);
+	grid.set(np, MINO_TYPE.SNAKE);
 	// set head sprite
 	grid.set([h], DIR_HEAD[snake.cur_dir]);
 	// snake set new pos
-	snake.set_pos(n_c);
+	snake.set_pos(np);
 }
 
 function draw_snake_d() {
@@ -327,16 +298,17 @@ function tick() {
 	if (ticks % SPEED.SNAKE_FALL == 0) {
 		draw_snake_d();
 	}
-	// Actions with fruit (draw, collisions e.t.c)
 	// NOTE: always draw fruit before spawning another one
 	if (ticks % SPEED.FRUIT_FALL === 0) {
 		draw_fruit();
 	}
-
 	if (ticks % SPEED.FOOD === 0) {
 		let f = new Fruit();
 		f.spawn();
 	}
+
+	// грязный хак, который работает
+	grid.set(tetr.minos, MINO_TYPE.ACTIVE);
 
 	// Don't remove
 	ticks++;
