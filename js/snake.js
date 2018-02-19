@@ -57,7 +57,6 @@ class Snake
 			} break;
 		}
 		this.cur_dir = dir; //this.dirs[dir];
-		console.log('dir set ', this.cur_dir);
 		return true;
 	}
 	
@@ -77,6 +76,16 @@ class Snake
 		n_c[0][1] += this.dirs[this.cur_dir][1];
 		// returnign new position
 		return n_c;
+	}
+
+	cut_on_tetr() {
+		let cs = _.filter(grid.collide(this.seg), (el) => {
+			return el[0] === MINO_TYPE.ACTIVE;
+		});
+		if (cs.length === 0) return;
+		let skin = this.cut(cs[0][1]);
+		grid.set(skin, MINO_TYPE.EMPTY);
+		snake_d = snake_d.concat(skin);
 	}
 	
     cut(index) {
