@@ -38,7 +38,7 @@ function init() {
 		parent: 'game',
 		antialias: true,
 		multiTexture: true,
-		transparent: true
+		//transparent: true
 	};
 	game = new Phaser.Game(config);
 	for (let s in states) {
