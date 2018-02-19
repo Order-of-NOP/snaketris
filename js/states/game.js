@@ -9,6 +9,7 @@ let fruit = [];
 // dead snake 
 let snake_d = [];
 let snake_spawner = null;
+let bg_sprite;
 
 function spawn_tetr() {
 	// TODO check collisions w/ snake and fruit
@@ -18,6 +19,9 @@ function spawn_tetr() {
 // TODO handle pause
 states['game'] = {
 	init: () => {
+		bg_sprite = game.add.tileSprite(0, 0,
+			game.cache.getImage('background').width,
+			game.cache.getImage('background').height, 'background');
 		grid = new Grid(SIZE.W, SIZE.H);
 	},
 	create: () => {
@@ -28,13 +32,13 @@ states['game'] = {
 		tetr = spawn_tetr();
 		clk.start();
 		// TODO uncomment when making fullscreen
-		/*game.input.onDown.add(() => {
+		game.input.onDown.add(() => {
 			if (game.scale.isFullScreen) {
 				game.scale.stopFullScreen();
 			} else {
 				game.scale.startFullScreen(false);
 			}
-		}, this);*/
+		}, this);
 		snake_spawner = new SnakeSpawner(grid.g);
 		snake_spawner.spawn('left');
 		grid.add_callback('clear', () => {
