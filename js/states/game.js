@@ -31,6 +31,7 @@ states['game'] = {
 		snake = new Snake(5, 2);
 		tetr = spawn_tetr();
 		clk.start();
+		console.log(game.paused);
 		// TODO uncomment when making fullscreen
 		game.input.onDown.add(() => {
 			if (game.scale.isFullScreen) {
@@ -76,12 +77,63 @@ states['game'] = {
 				snake_spawner.set_player_choice('right');
 			}
 		}
+		// Esc for pause
+		if (PAUSE.SWITCH_KEY.justReleased) {
+			game.paused = !game.paused;
+			console.log('menu!');
+		}
 	},
 	// When you swith to another state
 	shutdown: () => {
+		LAST_GAME_STATE = 'game';
 		grid.clear();
 		ticks = 0;
 		clk.destroy();
+		console.log(game.paused, 'shutdown');
+	},
+	paused: () => {
+		if (LAST_GAME_STATE == 'ready') {
+			game.paused = false;
+			LAST_GAME_STATE = 'game';
+			return;
+		}
+		// Init alpha screen
+		PAUSE.SCREEN_SPRT = game.add.sprite(0, 0, 'sheet');
+		PAUSE.SCREEN_SPRT.width = game.world.width;
+		PAUSE.SCREEN_SPRT.height = game.world.height;
+		PAUSE.SCREEN_SPRT.alpha = 0.5;
+		PAUSE.SCREEN_SPRT.tint = '#ffffff';
+		PAUSE.SCREEN_SPRT.animations.add('simple', [5], 500, true);
+		PAUSE.SCREEN_SPRT.animations.play('simple');
+		// There is init pause menu components
+		PAUSE.BTNS.push( new ButtonLabel(()=>{
+			game.paused = false;
+		}, 'Продолжить', BTN_STYLE, 100));
+		PAUSE.BTNS.push( new ButtonLabel(()=>{
+			game.paused = false;
+			game.state.start('ready');
+		}, 'Заново', BTN_STYLE, 140));
+		PAUSE.BTNS.push( new ButtonLabel(()=>{
+			game.paused = false;
+			game.state.start('settings');
+		}, 'Опции', BTN_STYLE, 180));
+		PAUSE.BTNS.push( new ButtonLabel(()=>{
+			game.paused = false;
+			game.state.start('menu');
+		}, 'Главное меню', BTN_STYLE, 220));
+	},
+	pauseUpdate: () => {
+		// Esc for pause
+		if (PAUSE.SWITCH_KEY.justReleased) {
+			game.paused = !game.paused;
+		}
+	},
+	resumed: () => {
+		_.each(PAUSE.BTNS, (e)=>{ e.destroy();});
+		PAUSE.BTNS = [];
+		if (PAUSE.SCREEN_SPRT != null)
+			PAUSE.SCREEN_SPRT.destroy();
+		game.world.alpha = 1;
 	}
 }
 

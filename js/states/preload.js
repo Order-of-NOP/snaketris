@@ -11,9 +11,13 @@ states['preload'] = {
 		document.querySelector('canvas').oncontextmenu
 			= function() { return false; };
 		input = new Input();
+		PAUSE.SWITCH_KEY = new Key(game.input.keyboard, Phaser.Keyboard.ESC);
 		game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL;
 		//game.stage.backgroundColor = '#120b92';
 		//game.state.start('menu');
 		game.state.start('game');
+	},
+	shutdown: () => {
+		LAST_GAME_STATE = 'preload';
 	}
 };

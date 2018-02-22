@@ -1,7 +1,16 @@
 /* states/settings.js */
 
+const SETTINGS_GUI = {
+	BTNS: []
+};
+
 states['settings'] = {
 	create: () => {
-		// TODO goto menu, ctrls
+		SETTINGS_GUI.BTNS.push(new ButtonLabel(()=>{
+			game.state.start('ctrls');
+		}, 'Управление', BTN_STYLE, 100));
+	},
+	shutdown: () => {
+		LAST_GAME_STATE = 'settings';
 	}
 };
