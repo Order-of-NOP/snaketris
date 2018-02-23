@@ -16,11 +16,6 @@ let lvl = 0;
 
 let score_label;
 
-const LBL_SCORE_STL = {
-    font: "bold 18px Arial",
-    fill: "#ccc"
-};
-
 const LVL_DELAY = [100, 90, 80, 70, 60, 50];
 
 function spawn_tetr() {
@@ -60,7 +55,7 @@ states['game'] = {
 			grid._cbs = {};
 		});
 
-		score_label = game.add.text(10, 10, "SCORE: ", LBL_SCORE_STL);
+		score_label = game.add.text(10, 10, "SCORE: ", TXT_STL.LBL_SCR);
 
 		grid.set(tetr.minos, MINO_TYPE.ACTIVE);
 	},
@@ -123,19 +118,19 @@ states['game'] = {
 		// There is init pause menu components
 		PAUSE.BTNS.push( new ButtonLabel(()=>{
 			game.paused = false;
-		}, 'Продолжить', BTN_STYLE, 100));
+		}, 'Продолжить', TXT_STL.BTN, 100));
 		PAUSE.BTNS.push( new ButtonLabel(()=>{
 			game.paused = false;
 			game.state.start('ready');
-		}, 'Заново', BTN_STYLE, 140));
+		}, 'Заново', TXT_STL.BTN, 140));
 		PAUSE.BTNS.push( new ButtonLabel(()=>{
 			game.paused = false;
 			game.state.start('settings');
-		}, 'Опции', BTN_STYLE, 180));
+		}, 'Опции', TXT_STL.BTN, 180));
 		PAUSE.BTNS.push( new ButtonLabel(()=>{
 			game.paused = false;
 			game.state.start('menu');
-		}, 'Главное меню', BTN_STYLE, 220));
+		}, 'Главное меню', TXT_STL.BTN, 220));
 	},
 	pauseUpdate: () => {
 		// Esc for pause

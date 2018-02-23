@@ -1,11 +1,17 @@
-const BTN_STYLE = {
-    font: "bold 32px Arial",
-    fill: "#ccc"
-};
-
-const LBL_RDY_STL = {
-    font: "bold 18px Arial",
-    fill: "#ccc"
+function TxtStyle(_ff = 'Arial', _fsz = '32px', _fc = '#fff', _fw = '', _fst = '')
+{
+    return { font: _ff, // Arial
+        fontStyle: _fst, // Italic etc
+        fontWeight: _fw, // Bold etc
+        fontSize: _fsz, // Size in pixels 
+        fill: _fc // fill color
+    };
+}
+// there is all styles for text
+const TXT_STL = {
+    BTN: TxtStyle('Arial', '32px', '#ccc'),
+    LBL_TTL: TxtStyle('Arial', '48px', '#eee'),
+    LBL_SCR: TxtStyle('Arial', '18px', '#ccc')
 };
 
 class ButtonLabel

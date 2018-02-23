@@ -16,15 +16,17 @@ let RDY_TIME = null;
 states['ready'] = {
 	create: () => {
 		READY_GUI.LBL.push( game.add.text(100, 200, 
-			'Press any key for say \'READY\'', LBL_RDY_STL));
+			'Press any key for say \'READY\'', TXT_STL.LBL_SCR));
 		READY_GUI.LBL.push( game.add.text(400, 200, 
-				'Press any key for say \'READY\'', LBL_RDY_STL));
-		READY_GUI.LBL.push( game.add.text(game.world.centerX-10, 100, 
-				'', BTN_STYLE));
+				'Press any key for say \'READY\'', TXT_STL.LBL_SCR));
+		READY_GUI.LBL.push( game.add.text(0,0, 
+				'', TXT_STL.LBL_TTL));
+		READY_GUI.LBL[2].centerX = game.world.centerX;
+		READY_GUI.LBL[2].centerY = game.world.centerY - 200;
 		READY_GUI.RD_LBL.push( game.add.text(100, 240, 
-			READY_LBLS[1], LBL_RDY_STL));
+			READY_LBLS[1], TXT_STL.LBL_SCR));
 		READY_GUI.RD_LBL.push( game.add.text(400, 240, 
-			READY_LBLS[1], LBL_RDY_STL));
+			READY_LBLS[1], TXT_STL.LBL_SCR));
 	},
 	update: () => {
 		if (RDY_TIME == null) {
