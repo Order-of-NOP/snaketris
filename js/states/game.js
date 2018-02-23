@@ -35,12 +35,7 @@ states['game'] = {
 		clk = game.time.events.loop(tick_time, tick, this)
 		snake = new Snake(5, 2);
 		tetr = spawn_tetr();
-<<<<<<< HEAD
 		//clk.start();
-=======
-		clk.start();
-		console.log(game.paused);
->>>>>>> 8b8e374ebb879ca775f5286fdb2d92514721e8f4
 		// TODO uncomment when making fullscreen
 		/*game.input.onDown.add(() => {
 			if (game.scale.isFullScreen) {
@@ -53,6 +48,8 @@ states['game'] = {
 		snake_spawner.spawn('left');
 		grid.add_callback('clear', () => {
 			fruit = [];
+			snake_d = [];
+			lvl = 0;
 			grid._cbs = {};
 		});
 
@@ -97,7 +94,6 @@ states['game'] = {
 		LAST_GAME_STATE = 'game';
 		grid.clear();
 		ticks = 0;
-		clk.destroy();
 		console.log(game.paused, 'shutdown');
 	},
 	paused: () => {
@@ -384,7 +380,7 @@ function tick() {
 	if (ticks % SPEED.FRUIT_FALL === 0) {
 		draw_fruit();
 	}
-	if (ticks % SPEED.FOOD === 0) {
+	if (ticks % SPEED.FOOD === 0 || fruit.length === 0) {
 		let f = new Fruit();
 		f.spawn();
 	}
