@@ -30,6 +30,15 @@ const PL = {
 	TETR: 1
 };
 
+// For pause
+const PAUSE = {
+	BTNS: [], // Continue btn
+	SWITCH_KEY: null, // Key for switch between game/pause
+	SCREEN_SPRT: null
+}
+
+let LAST_GAME_STATE = '';
+
 function init() {
 	const config = {
 		width: 768,
