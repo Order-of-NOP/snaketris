@@ -157,6 +157,7 @@ function draw_fruit() {
 	}
 }
 
+let boost_drop = false;
 function tetr_fall(pwr) {
 	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
 		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
@@ -176,6 +177,7 @@ function tetr_fall(pwr) {
 		}
 		if (snake_body.indexOf(c) >= 0) {
 			snake.cut_on_tetr();
+			boost_drop = true;
 		}
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
@@ -208,6 +210,7 @@ function tetr_rotate() {
 		}
 		if (snake_body.indexOf(c) >= 0) {
 			snake.cut_on_tetr();
+			boost_drop = true;
 		}
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
@@ -313,6 +316,7 @@ function draw_snake() {
 			grid.set(skin, MINO_TYPE.EMPTY);
 			snake_d = snake_d.concat(skin);
 			np.splice(n);
+			boost_drop = true;
 			break;
 		}
 	}
@@ -401,7 +405,10 @@ function tick() {
 	erase_lines();
 	if (ticks % SPEED.TETR_ROTATE === 0) tetr_rotate();
 	if (ticks % SPEED.TETR_SHIFT === 0) tetr_shift();
-	if (ticks % (tetr.boost ? SPEED.TETR_BOOST : SPEED.TETR) === 0) {
+	if (ticks % (tetr.boost && !boost_drop ? SPEED.TETR_BOOST
+		: SPEED.TETR) === 0)
+	{
+		boost_drop = false;
 		tetr_fall(tetr.boost);
 	}
 	if (ticks % SPEED.SNAKE == 0) {
