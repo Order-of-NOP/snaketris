@@ -9,25 +9,18 @@ const READY_GUI = {
 const READY_FLGS = [ false, false ];
 const READY_LBLS = ['READY', 'NOT READY'];
 
-const LBL_RDY_STL = {
-    font: "bold 18px Arial",
-    fill: "#ccc"
-};
-
 const TIME_DELAY = 3000;
 
 let RDY_TIME = null;
 
 states['ready'] = {
 	create: () => {
-		READY_GUI.BTNS.push(new ButtonLabel(()=>{
-			game.state.start('game');
-			game.paused = false;
-		}, 'Начать игру', BTN_STYLE, 100));
 		READY_GUI.LBL.push( game.add.text(100, 200, 
 			'Press any key for say \'READY\'', LBL_RDY_STL));
 		READY_GUI.LBL.push( game.add.text(400, 200, 
 				'Press any key for say \'READY\'', LBL_RDY_STL));
+		READY_GUI.LBL.push( game.add.text(game.world.centerX-10, 100, 
+				'', BTN_STYLE));
 		READY_GUI.RD_LBL.push( game.add.text(100, 240, 
 			READY_LBLS[1], LBL_RDY_STL));
 		READY_GUI.RD_LBL.push( game.add.text(400, 240, 
@@ -58,9 +51,8 @@ states['ready'] = {
 			}
 		} else {
 			let time = RDY_TIME - game.time.now;
-			console.log(time);
-			if (time < 0) {
-				console.log(time);
+			READY_GUI.LBL[2].text = (time > -1 ? (time/1000).toFixed(2) : 0);
+			if (time < 10) {
 				game.state.start('game');
 			}
 		}

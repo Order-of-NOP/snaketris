@@ -11,11 +11,11 @@ class SnakeSpawner {
             player_choice: 'right',
             position_y: 2,
             time: 0,
-            max_pushs_confirms: 2,
+            max_pushs_confirms: 1,
             player_confirms: 0
         };
         this.timer = null;
-        this.sprite = null;
+        this.sprite = [ null, null, null];
         this.grid_g = _g;
         this.coords = {
             left: [
@@ -70,9 +70,11 @@ class SnakeSpawner {
             this.timer.destroy();
             this.timer = null;
         }
-        if (this.sprite !== null) {
-            this.sprite.destroy();
-            this.sprite = null; 
+        if (this.sprite[0] !== null) {
+            for(let i = 0; i < this.sprite.length; i++) {
+                this.sprite[i].destroy();
+                this.sprite[i] = null; 
+            }
         }
         this._spawn.player_confirms = 0;
         this.__spawn();
@@ -96,13 +98,15 @@ class SnakeSpawner {
         this.timer = game.time.create(false);
         this.timer.loop(this.animation.delay, this.timer_loop, this);
         
-        if (this.sprite !== null) this.stop();
-        let pos = this.coords[this._spawn.player_choice][1];
-        this.sprite = game.add.sprite(pos[0]*TILE_SIZE, 
-            pos[1]*TILE_SIZE, 'sheet');
-        this.sprite.animations.add('simple', [3], 100, true);
-        this.sprite.animations.play('simple');
-        this.sprite.width = TILE_SIZE*3;
+        if (this.sprite[0] !== null) this.stop();
+        let side = this._spawn.player_choice;
+        let pos = this.coords[side];
+        for(let i = 0; i < this.sprite.length; i++) {
+            this.sprite[i] = game.add.sprite((pos[i][0])*TILE_SIZE, 
+                pos[i][1]*TILE_SIZE, 'sheet');
+            this.sprite[i].animations.add('simple', [ i == 0 ? 3 : 1 ], 100, true);
+            this.sprite[i].animations.play('simple');
+        }
         this._spawn.time = game.time.now + this._spawn.delay;
         this.timer.start(0.0);
     }
@@ -117,20 +121,21 @@ class SnakeSpawner {
 
     timer_loop() {
         this.animation.alpha = (this.animation.alpha + this.animation.flash_dx) % 1;
-        this.sprite.alpha = this.animation.alpha;
+        _.each(this.sprite, (e)=>{ e.alpha = this.animation.alpha; });
         let pos = null;
-        
         if (this._spawn.player_choice === 'left') {
-            pos = this.coords[this._spawn.player_choice][2];
+            pos = this.coords[this._spawn.player_choice];
         } else if (this._spawn.player_choice === 'right') {
-            pos = this.coords[this._spawn.player_choice][0];
+            pos = this.coords[this._spawn.player_choice];
         }
 
         if (pos == null) {
             console.warn('Error: pos = null');
         } else {
-            this.sprite.x = pos[0]*TILE_SIZE;
-            this.sprite.y = pos[1]*TILE_SIZE;
+            for(let i = 0; i < 3; i++) {
+                this.sprite[i].x = pos[i][0]*TILE_SIZE;
+                this.sprite[i].y = pos[i][1]*TILE_SIZE;
+            }
         }
         
         if (this._spawn.player_confirms === this._spawn.max_pushs_confirms) {

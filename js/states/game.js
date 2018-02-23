@@ -14,6 +14,13 @@ let bg_sprite;
 let score = 0;
 let lvl = 0;
 
+let score_label;
+
+const LBL_SCORE_STL = {
+    font: "bold 18px Arial",
+    fill: "#ccc"
+};
+
 const LVL_DELAY = [100, 90, 80, 70, 60, 50];
 
 function spawn_tetr() {
@@ -52,6 +59,8 @@ states['game'] = {
 			lvl = 0;
 			grid._cbs = {};
 		});
+
+		score_label = game.add.text(10, 10, "SCORE: ", LBL_SCORE_STL);
 
 		grid.set(tetr.minos, MINO_TYPE.ACTIVE);
 	},
@@ -95,6 +104,7 @@ states['game'] = {
 		grid.clear();
 		ticks = 0;
 		console.log(game.paused, 'shutdown');
+		score = 0;
 	},
 	paused: () => {
 		if (LAST_GAME_STATE == 'ready') {
@@ -410,6 +420,8 @@ function tick() {
 
 	// грязный хак, который работает
 	grid.set(tetr.minos, MINO_TYPE.ACTIVE);
+
+	score_label.text = "SCORE: " + score;
 
 	// Don't remove
 	ticks++;

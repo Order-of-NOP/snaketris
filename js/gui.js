@@ -1,5 +1,10 @@
-var BTN_STYLE = {
+const BTN_STYLE = {
     font: "bold 32px Arial",
+    fill: "#ccc"
+};
+
+const LBL_RDY_STL = {
+    font: "bold 18px Arial",
     fill: "#ccc"
 };
 
