@@ -293,6 +293,7 @@ function draw_snake() {
 			np.push([snake.seg[n][0], snake.seg[n][1]])
 			// find fruit with this position and pop it
 			fruit_find(np[0][0], np[0][1]).destroy();
+			set_score(5);
 		}
 		if (n === 0 && ![MINO_TYPE.SNAKE, MINO_TYPE.FRUIT].includes(c)) {
 			// die, mah-fukker, die!
@@ -347,6 +348,13 @@ function draw_snake_d() {
 	snake_d = n_c;
 }
 
+function set_score(val) {
+	score += parseInt(val);
+	if (parseInt(score / 500) > lvl) {
+		clk.delay = LVL_DELAY[++lvl];
+	}
+}
+
 function erase_lines() {
 	let full = [];
 	let blk = [MINO_TYPE.STILL, MINO_TYPE.DEAD, MINO_TYPE.HEAVY];
@@ -375,6 +383,7 @@ function erase_lines() {
 			grid.set([[c, 0]], MINO_TYPE.EMPTY);
 		}
 	}
+	set_score(40*(lvl+1) + 20*(full.length - 1));
 	for (let r = 0; r < grid.h; ++r)
 	for (let c = 0; c < grid.w; ++c) {
 		if (grid.g[r][c] === MINO_TYPE.DEAD) {
