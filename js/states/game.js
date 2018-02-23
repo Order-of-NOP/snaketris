@@ -357,7 +357,30 @@ function erase_lines() {
 		}
 		if (c === grid.w) full.push(r);
 	}
-	// TODO ...
+	if (full.length === 0) return;
+	snake_d = [];
+	for (let i = 0; i < full.length; ++i) {
+		/* running through all the columns */
+		for (let c = 0; c < grid.w; ++c) {
+			for (let r = full[i]; r > 0; --r) {
+				if (grid.g[r][c] === MINO_TYPE.HEAVY) {
+					if (r + 1 < grid.h) grid.set([[c, r+1]], MINO_TYPE.EMPTY);
+					break;
+				}
+				if (!blk.concat(MINO_TYPE.EMPTY).includes(grid.g[r][c]))
+					continue;
+				grid.set([[c, r]], (blk.includes(grid.g[r-1][c]))
+					? grid.g[r-1][c] : MINO_TYPE.EMPTY);
+			}
+			grid.set([[c, 0]], MINO_TYPE.EMPTY);
+		}
+	}
+	for (let r = 0; r < grid.h; ++r)
+	for (let c = 0; c < grid.w; ++c) {
+		if (grid.g[r][c] === MINO_TYPE.DEAD) {
+			snake_d.push([c, r]);
+		}
+	}
 }
 
 function tick() {
