@@ -30,12 +30,16 @@ const PL = {
 	TETR: 1
 };
 
-// For pause
-const PAUSE = {
-	BTNS: [], // Continue btn
-	SWITCH_KEY: null, // Key for switch between game/pause
-	SCREEN_SPRT: null
+function MOD(a, b, c) {
+	let s = a + b;
+	if ( s == 0 ) return 0;
+	if (s > 0) return s % c;
+	if (s < 0) return c + s;
 }
+
+const CONFIG = {
+	FULL_SCREEN_MODE: false
+};
 
 let LAST_GAME_STATE = '';
 

@@ -15,6 +15,20 @@ let score = 0;
 let lvl = 0;
 
 let score_label;
+// for switch beetwen menu with help key
+let pause_btn_ind = 0;
+
+// For pause
+const PAUSE = {
+	GUI: {
+		BTNS: [], // Continue btn
+	},
+	CALLBACKS: [],
+	SWITCH_KEY: null, // Key for switch between game/pause
+	SCREEN_SPRT: null,
+	TO_SETTINGS: false
+}
+let flg_choice = false;
 
 const LVL_DELAY = [100, 90, 80, 70, 60, 50];
 
@@ -39,13 +53,15 @@ states['game'] = {
 		tetr = spawn_tetr();
 		//clk.start();
 		// TODO uncomment when making fullscreen
-		/*game.input.onDown.add(() => {
-			if (game.scale.isFullScreen) {
-				game.scale.stopFullScreen();
-			} else {
-				game.scale.startFullScreen(false);
+		game.input.onDown.add(() => {
+			if (CONFIG.FULL_SCREEN_MODE) {
+				if (game.scale.isFullScreen) {
+					game.scale.stopFullScreen();
+				} else {
+					game.scale.startFullScreen(false);
+				}
 			}
-		}, this);*/
+		}, this);
 		snake_spawner = new SnakeSpawner(grid.g);
 		snake_spawner.spawn('left');
 		grid.add_callback('clear', () => {
@@ -92,17 +108,27 @@ states['game'] = {
 			game.paused = !game.paused;
 			console.log('menu!');
 		}
+
+		console.log('ADSs');
 	},
 	// When you swith to another state
 	shutdown: () => {
 		LAST_GAME_STATE = 'game';
-		grid.clear();
-		ticks = 0;
-		console.log(game.paused, 'shutdown');
-		score = 0;
+		flg_choice = false;
+		if (PAUSE.TO_SETTINGS) {
+			grid.clear();
+			ticks = 0;
+			score = 0;
+		}
+		clear_gui(PAUSE.GUI);
+		PAUSE.CALLBACKS = [];
+		if (PAUSE.SCREEN_SPRT != null) {
+			PAUSE.SCREEN_SPRT.destroy();
+			PAUSE.SCREEN_SPRT = null;
+		}
 	},
 	paused: () => {
-		if (LAST_GAME_STATE == 'ready') {
+		if (LAST_GAME_STATE != 'game') {
 			game.paused = false;
 			LAST_GAME_STATE = 'game';
 			return;
@@ -116,33 +142,84 @@ states['game'] = {
 		PAUSE.SCREEN_SPRT.animations.add('simple', [5], 500, true);
 		PAUSE.SCREEN_SPRT.animations.play('simple');
 		// There is init pause menu components
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
-			game.paused = false;
-		}, 'Продолжить', TXT_STL.BTN, 100));
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
+		// init callbacks
+		PAUSE.CALLBACKS.push(()=> { game.paused = false; });
+		PAUSE.CALLBACKS.push(()=>{
 			game.paused = false;
 			game.state.start('ready');
-		}, 'Заново', TXT_STL.BTN, 140));
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
+		});
+		PAUSE.CALLBACKS.push(()=> { 
 			game.paused = false;
 			game.state.start('settings');
-		}, 'Опции', TXT_STL.BTN, 180));
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
+			PAUSE.TO_SETTINGS = true;
+		});
+		PAUSE.CALLBACKS.push(()=> { 
 			game.paused = false;
 			game.state.start('menu');
-		}, 'Главное меню', TXT_STL.BTN, 220));
+		});
+
+		// init buttons
+		PAUSE.GUI.BTNS.push(new ButtonLabel(
+			PAUSE.CALLBACKS[0], 'Продолжить', TXT_STL.BTN, 100));
+		PAUSE.GUI.BTNS.push(new ButtonLabel(
+			PAUSE.CALLBACKS[1], 'Заново', TXT_STL.BTN, 140));
+		PAUSE.GUI.BTNS.push(new ButtonLabel(
+			PAUSE.CALLBACKS[2], 'Опции', TXT_STL.BTN, 180));
+		PAUSE.GUI.BTNS.push(new ButtonLabel(
+			PAUSE.CALLBACKS[3], 'Главное меню', TXT_STL.BTN, 220));
 	},
 	pauseUpdate: () => {
 		// Esc for pause
 		if (PAUSE.SWITCH_KEY.justReleased) {
 			game.paused = !game.paused;
 		}
+		// for menu
+		for(let i = 0; i < input.p.length; i++) {
+			let ip = input.p[i];
+			/*if (!flg_choice) {
+				if (ip['down'].isDown){
+					flg_choice = true;;
+				} else 
+				if (ip['up'].isDown){
+					flg_choice = true;
+				} else
+				if (ip['right'].isDown) {
+					flg_choice = true;
+				}
+			} else {*/
+				if (ip['down'].justReleased){	
+					if (flg_choice) {
+						PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
+						pause_btn_ind = MOD(pause_btn_ind, 1, PAUSE.GUI.BTNS.length);
+						PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
+						flg_choice = false;
+						console.log('down isUp');
+					}		
+				} else 
+				if (ip['up'].justReleased){
+					if (flg_choice) {
+						PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
+						pause_btn_ind = MOD(pause_btn_ind, -1, PAUSE.GUI.BTNS.length);
+						PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
+						flg_choice = false;
+						console.log('up isUp');
+					}		
+				} else
+				if (ip['right'].isDown) {
+					PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
+					PAUSE.CALLBACKS[pause_btn_ind]();
+					flg_choice = false;
+				}
+			//}
+		}
 	},
 	resumed: () => {
-		_.each(PAUSE.BTNS, (e)=>{ e.destroy();});
-		PAUSE.BTNS = [];
-		if (PAUSE.SCREEN_SPRT != null)
+		clear_gui(PAUSE.GUI);
+		PAUSE.TO_SETTINGS = false;
+		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();
+			PAUSE.SCREEN_SPRT = null;
+		}
 		game.world.alpha = 1;
 	}
 }

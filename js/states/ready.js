@@ -62,12 +62,7 @@ states['ready'] = {
 	shutdown: () => {
 		LAST_GAME_STATE = 'ready';
 		// Здесь всё занулять и чистить
-		_.each(READY_GUI.BTNS, (e)=>{ e.destroy(); });
-		_.each(READY_GUI.LBL, (e)=>{ e.destroy(); });
-		_.each(READY_GUI.RD_LBL, (e)=>{ e.destroy(); });
-		READY_GUI.BTNS = [];
-		READY_GUI.LBL = [];
-		READY_GUI.RD_LBL = [];
+		clear_gui(READY_GUI);
 		READY_FLGS[0] = false;
 		READY_FLGS[1] = false;
 		RDY_TIME = null;
