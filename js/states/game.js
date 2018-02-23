@@ -11,6 +11,11 @@ let snake_d = [];
 let snake_spawner = null;
 let bg_sprite;
 
+let score = 0;
+let lvl = 0;
+
+const LVL_DELAY = [100, 90, 80, 70, 60, 50];
+
 function spawn_tetr() {
 	// TODO check collisions w/ snake and fruit
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
@@ -25,20 +30,20 @@ states['game'] = {
 		grid = new Grid(SIZE.W, SIZE.H);
 	},
 	create: () => {
-		let tick_time = 100;
-		clk = game.time.create(false);
-		clk.loop(tick_time, tick, this)
+		let tick_time = LVL_DELAY[lvl];
+		//clk = game.time.create(false);
+		clk = game.time.events.loop(tick_time, tick, this)
 		snake = new Snake(5, 2);
 		tetr = spawn_tetr();
-		clk.start();
+		//clk.start();
 		// TODO uncomment when making fullscreen
-		game.input.onDown.add(() => {
+		/*game.input.onDown.add(() => {
 			if (game.scale.isFullScreen) {
 				game.scale.stopFullScreen();
 			} else {
 				game.scale.startFullScreen(false);
 			}
-		}, this);
+		}, this);*/
 		snake_spawner = new SnakeSpawner(grid.g);
 		snake_spawner.spawn('left');
 		grid.add_callback('clear', () => {
@@ -215,10 +220,15 @@ function tetr_shift() {
 	grid.set(np, MINO_TYPE.ACTIVE);
 }
 
-// !!! WARNING
-// I have done collide with head only
-// TODO cut Snake w/ Tetr
 function draw_snake() {
+	// relevant when was killed by Tetr
+	if (snake.seg.length == 0) {
+		grid.set(snake.seg, MINO_TYPE.EMPTY);
+		snake_d = snake_d.concat(snake.seg);
+		//adding delay and spawn option
+		snake_spawner.spawn('left');
+		return;
+	}
 	// get new coord
 	let np = snake.move();
 	let res = grid.collide(np);
@@ -285,9 +295,21 @@ function draw_snake_d() {
 	snake_d = n_c;
 }
 
+function erase_lines() {
+	let full = [];
+	let blk = [MINO_TYPE.STILL, MINO_TYPE.DEAD, MINO_TYPE.HEAVY];
+	for (let r = 0; r < grid.h; ++r) {
+		let c;
+		for (c = 0; c < grid.w; ++c) {
+			if (!blk.includes(grid.g[r][c])) break;
+		}
+		if (c === grid.w) full.push(r);
+	}
+	// TODO ...
+}
+
 function tick() {
-	// TODO snake goes here
-	// tetr goes here
+	erase_lines();
 	if (ticks % SPEED.TETR_ROTATE === 0) tetr_rotate();
 	if (ticks % SPEED.TETR_SHIFT === 0) tetr_shift();
 	if (ticks % (tetr.boost ? SPEED.TETR_BOOST : SPEED.TETR) === 0) {
