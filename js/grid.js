@@ -189,4 +189,30 @@ class Grid {
 	rm_callbacks(evt) {
 		delete this._cbs[evt.toString()];
 	}
+
+	animate(_x, _y, anim, mod) {
+		if (anim === 'explode') {
+			let x =  _x * TILE_SIZE - 15;
+			let y =  _y * TILE_SIZE - 10;
+			let angle = 0;
+
+			if (mod === 'l') {
+				x = _x * TILE_SIZE + 42;
+				y = _y * TILE_SIZE - 15;
+				angle = 90;
+			}
+			else if (mod === 'r') {
+				x = _x * TILE_SIZE;
+				y = _y * TILE_SIZE + 47;
+				angle = -90;
+			}
+
+			let xpl = game.add.sprite(x, y, 'explosion', 0);
+			xpl.angle = angle;
+			xpl.animations.add('explode').onComplete.add(() => {
+				xpl.destroy();
+			});
+			xpl.play('explode');
+		}
+	}
 }

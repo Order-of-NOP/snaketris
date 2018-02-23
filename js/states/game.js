@@ -38,14 +38,14 @@ states['game'] = {
 		snake = new Snake(5, 2);
 		tetr = spawn_tetr();
 		//clk.start();
-		// TODO uncomment when making fullscreen
-		/*game.input.onDown.add(() => {
+		game.input.onDown.add((ptr) => {
+			if (!ptr.rightButton.isDown) return;
 			if (game.scale.isFullScreen) {
 				game.scale.stopFullScreen();
 			} else {
 				game.scale.startFullScreen(false);
 			}
-		}, this);*/
+		}, this);
 		snake_spawner = new SnakeSpawner(grid.g);
 		snake_spawner.spawn('left');
 		grid.add_callback('clear', () => {
