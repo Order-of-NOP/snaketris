@@ -23,7 +23,6 @@ function spawn_tetr() {
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
 }
 
-// TODO handle pause
 states['game'] = {
 	init: () => {
 		bg_sprite = game.add.tileSprite(0, 0,
@@ -401,8 +400,18 @@ function erase_lines() {
 	}
 }
 
+function game_over() {
+	for (let i = 0; i < grid.w; ++i) {
+		if (grid.g[0][i] === MINO_TYPE.STILL) {
+			console.log('GAME OVER!');
+			// TODO jump to game over state
+		}
+	}
+}
+
 function tick() {
 	erase_lines();
+	game_over();
 	if (ticks % SPEED.TETR_ROTATE === 0) tetr_rotate();
 	if (ticks % SPEED.TETR_SHIFT === 0) tetr_shift();
 	if (ticks % (tetr.boost && !boost_drop ? SPEED.TETR_BOOST
