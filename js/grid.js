@@ -216,7 +216,7 @@ class Grid {
 		} else if (anim === 'lightning') {
 			let y = _y * TILE_SIZE;
 			let lght = game.add.sprite(0, y, 'lightning', 0);
-			lght.animations.add('light').onComplete.add(() => {
+			lght.animations.add('light', null, 30).onComplete.add(() => {
 					lght.destroy();
 				});
 			lght.play('light');
