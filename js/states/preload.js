@@ -5,8 +5,8 @@ states['preload'] = {
 		game.load.spritesheet('sheet', 'img/sheet.png',
 			TILE_SIZE, TILE_SIZE);
 		game.load.image('background', 'img/bg.png');
-		game.load.spritesheet('explosion', 'img/explosion.png',
-			63, 42);
+		game.load.spritesheet('explosion', 'img/explosion.png', 63, 42);
+		game.load.spritesheet('lightning', 'img/lightning.png', 808, 32)
 	},
 	create: () => {
 		// wanna do something useful on right click

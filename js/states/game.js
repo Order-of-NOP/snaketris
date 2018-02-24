@@ -28,6 +28,7 @@ states['game'] = {
 		bg_sprite = game.add.tileSprite(0, 0,
 			game.cache.getImage('background').width,
 			game.cache.getImage('background').height, 'background');
+		game.plugins.screenShake = game.plugins.add(Phaser.Plugin.ScreenShake);
 		grid = new Grid(SIZE.W, SIZE.H);
 	},
 	create: () => {
@@ -390,8 +391,10 @@ function erase_lines() {
 			}
 			grid.set([[c, 0]], MINO_TYPE.EMPTY);
 		}
+		grid.animate(0, full[i], 'lightning');
 	}
 	set_score(40*(lvl+1) + 20*(full.length - 1));
+	game.plugins.screenShake.shake(16);
 	for (let r = 0; r < grid.h; ++r)
 	for (let c = 0; c < grid.w; ++c) {
 		if (grid.g[r][c] === MINO_TYPE.DEAD) {
