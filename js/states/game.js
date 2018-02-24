@@ -176,7 +176,7 @@ states['game'] = {
 		// for menu
 		for(let i = 0; i < input.p.length; i++) {
 			let ip = input.p[i];
-			/*if (!flg_choice) {
+			if (!flg_choice) {
 				if (ip['down'].isDown){
 					flg_choice = true;;
 				} else 
@@ -186,31 +186,30 @@ states['game'] = {
 				if (ip['right'].isDown) {
 					flg_choice = true;
 				}
-			} else {*/
-				if (ip['down'].justReleased){	
-					if (flg_choice) {
-						PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
-						pause_btn_ind = MOD(pause_btn_ind, 1, PAUSE.GUI.BTNS.length);
-						PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
-						flg_choice = false;
-						console.log('down isUp');
-					}		
-				} else 
-				if (ip['up'].justReleased){
-					if (flg_choice) {
-						PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
-						pause_btn_ind = MOD(pause_btn_ind, -1, PAUSE.GUI.BTNS.length);
-						PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
-						flg_choice = false;
-						console.log('up isUp');
-					}		
-				} else
-				if (ip['right'].isDown) {
+			}
+		}
+		for(let i = 0; i < input.p.length; i++) {
+			let ip = input.p[i];
+			if (ip['down'].justReleased){
+				if (flg_choice) {
+					PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
+					pause_btn_ind = MOD(pause_btn_ind, 1, PAUSE.GUI.BTNS.length);
 					PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
-					PAUSE.CALLBACKS[pause_btn_ind]();
 					flg_choice = false;
 				}
-			//}
+			} else 
+			if (ip['up'].justReleased){
+				if(flg_choice) {
+					PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
+					pause_btn_ind = MOD(pause_btn_ind, -1, PAUSE.GUI.BTNS.length);
+					PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
+					flg_choice = false;
+				}
+			} else
+			if (ip['right'].isDown) {
+				PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
+				PAUSE.CALLBACKS[pause_btn_ind]();
+			}
 		}
 	},
 	resumed: () => {

@@ -16,7 +16,8 @@ states['ctrls'] = {
 		CTRLS.GUI.BTNS[0].back();
 
 		// labels
-		//LBL.push( game.add.text(0, 0, ""))
+		CTRLS.GUI.LBL.push( game.add.text(10, 10, "SNAKE", TXT_STL.LBL_TTL));
+		CTRLS.GUI.LBL.push( game.add.text(340, 10, "TETRIS", TXT_STL.LBL_TTL));
 	},
 	shutdown: () => {
 		LAST_GAME_STATE = 'ctrls';
