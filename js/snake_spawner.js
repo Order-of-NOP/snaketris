@@ -128,7 +128,7 @@ class SnakeSpawner {
         } else if (this._spawn.player_choice === 'right') {
             pos = this.coords[this._spawn.player_choice];
         }
-
+    
         if (pos == null) {
             console.warn('Error: pos = null');
         } else {
@@ -144,6 +144,7 @@ class SnakeSpawner {
         if (this._spawn.time < game.time.now) {
             this.stop();
         }
+
     }
 
 }

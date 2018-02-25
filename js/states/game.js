@@ -16,6 +16,17 @@ let score = 0;
 let lvl = 0;
 
 let score_label;
+// for switch beetwen menu with help key
+let pause_btn_ind = 0;
+
+// For pause
+let PAUSE = new Gui();
+PAUSE.SWITCH_KEY  = null;
+PAUSE.SCREEN_SPRT = null;
+PAUSE.TO_SETTINGS = null;
+PAUSE.PAUSED = false;
+PAUSE.LST_PRS1 = [true, true, true];
+PAUSE.LST_PRS2 = [true, true, true];
 
 const LVL_DELAY = [100, 90, 80, 70, 60, 50];
 
@@ -96,20 +107,26 @@ states['game'] = {
 		}
 		// Esc for pause
 		if (PAUSE.SWITCH_KEY.justReleased) {
-			game.paused = !game.paused;
-			console.log('menu!');
+			game.paused = ! game.paused;
 		}
 	},
 	// When you swith to another state
 	shutdown: () => {
 		LAST_GAME_STATE = 'game';
-		grid.clear();
-		ticks = 0;
-		console.log(game.paused, 'shutdown');
-		score = 0;
+		flg_choice = false;
+		if (PAUSE.TO_SETTINGS) {
+			grid.clear();
+			ticks = 0;
+			score = 0;
+		}
+		PAUSE.clear();
+		if (PAUSE.SCREEN_SPRT != null) {
+			PAUSE.SCREEN_SPRT.destroy();
+			PAUSE.SCREEN_SPRT = null;
+		}
 	},
 	paused: () => {
-		if (LAST_GAME_STATE == 'ready') {
+		if (LAST_GAME_STATE != 'game') {
 			game.paused = false;
 			LAST_GAME_STATE = 'game';
 			return;
@@ -123,33 +140,49 @@ states['game'] = {
 		PAUSE.SCREEN_SPRT.animations.add('simple', [5], 500, true);
 		PAUSE.SCREEN_SPRT.animations.play('simple');
 		// There is init pause menu components
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
-			game.paused = false;
-		}, 'Продолжить', TXT_STL.BTN, 100));
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
-			game.paused = false;
-			game.state.start('ready');
-		}, 'Заново', TXT_STL.BTN, 140));
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
-			game.paused = false;
-			game.state.start('settings');
-		}, 'Опции', TXT_STL.BTN, 180));
-		PAUSE.BTNS.push( new ButtonLabel(()=>{
-			game.paused = false;
-			game.state.start('menu');
-		}, 'Главное меню', TXT_STL.BTN, 220));
+
+		PAUSE.add_btn(
+			()=> { game.paused = false; },
+			'Continue', TXT_STL.BTN);
+		
+		PAUSE.add_btn(
+			()=> { game.paused = false; game.state.start('ready'); },
+			'Again', TXT_STL.BTN);
+		
+		PAUSE.add_btn(
+			()=> { game.paused = false; game.state.start('settings'); },
+			'Settings', TXT_STL.BTN);
+
+		PAUSE.add_btn(
+			()=> { game.paused = false; game.state.start('menu'); },
+			'Main menu', TXT_STL.BTN);
 	},
 	pauseUpdate: () => {
 		// Esc for pause
 		if (PAUSE.SWITCH_KEY.justReleased) {
 			game.paused = !game.paused;
 		}
+		let isDown;
+		isDown = input.p[0]['down'].isDown;
+		if (isDown && !PAUSE.LST_PRS1[0]) { PAUSE.next(); } PAUSE.LST_PRS1[0] = isDown;
+		isDown = input.p[0]['up'].isDown;
+		if (isDown && !PAUSE.LST_PRS1[1]) { PAUSE.prev(); } PAUSE.LST_PRS1[1] = isDown;
+		isDown = input.p[0]['right'].isDown;
+		if (isDown && !PAUSE.LST_PRS1[2]) { PAUSE.call(); } PAUSE.LST_PRS1[2] = isDown;
+		isDown = input.p[1]['down'].isDown;
+		if (isDown && !PAUSE.LST_PRS2[0]) { PAUSE.next(); } PAUSE.LST_PRS2[0] = isDown;
+		isDown = input.p[1]['up'].isDown;
+		if (isDown && !PAUSE.LST_PRS2[1]) { PAUSE.prev(); } PAUSE.LST_PRS2[1] = isDown;
+		isDown = input.p[1]['right'].isDown;
+		if (isDown && !PAUSE.LST_PRS2[2]) { PAUSE.call(); } PAUSE.LST_PRS2[2] = isDown;	
 	},
 	resumed: () => {
-		_.each(PAUSE.BTNS, (e)=>{ e.destroy();});
-		PAUSE.BTNS = [];
-		if (PAUSE.SCREEN_SPRT != null)
+		PAUSE.clear();
+		PAUSE.TO_SETTINGS = false;
+		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();
+			PAUSE.SCREEN_SPRT = null;
+		}
 		game.world.alpha = 1;
 	}
 }

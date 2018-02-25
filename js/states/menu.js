@@ -1,21 +1,29 @@
 /* states/menu.js */
 
-const MENU_GUI = {
-	BTNS: []
-};
+
+const MENU = new Gui();
 
 states['menu'] = {
 	create: () => {
+		MENU.add_btn(
+			()=>{ game.state.start('ready'); }, 'Start game', TXT_STL.BTN);
 
-		MENU_GUI.BTNS.push(new ButtonLabel(()=>{
-			game.state.start('ready');
-		}, 'Начать игру', TXT_STL.BTN, 100));
-
-		MENU_GUI.BTNS.push(new ButtonLabel(()=>{
-			game.state.start('ready');
-		}, 'Ещё пункт меню', TXT_STL.BTN, 140));
+		MENU.add_btn(
+			()=>{ game.state.start('settings'); }, 'Settings', TXT_STL.BTN);
+		
+		MENU.add_btn(
+			()=>{ game.state.start('records'); }, 'Records', TXT_STL.BTN);	
+		
+		MENU.add_btn(
+			()=>{ game.state.start('gameover'); }, 'Game over', TXT_STL.BTN);	
+	
 	},
+	update: () => {
+		MENU.btn_choose();
+	},
+
 	shutdown: () => {
 		LAST_GAME_STATE = 'menu';
+		MENU.clear();
 	}
 }
