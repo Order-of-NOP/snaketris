@@ -4,6 +4,7 @@ let clk = null;
 let ticks = 0;
 let snake;
 let tetr;
+let tetr_jp_dir = X_DIR.NONE;
 // active fruit
 let fruit = [];
 // dead snake 
@@ -60,27 +61,33 @@ states['game'] = {
 		grid.set(tetr.minos, MINO_TYPE.ACTIVE);
 	},
 	update: () => {
+		//input.debug();
 		tetr.boost = input.p[PL.TETR]['down'].isDown;
+		if (tetr_jp_dir === X_DIR.NONE) {
+			tetr_jp_dir =
+				(input.p[PL.TETR]['left'].justPressed)*X_DIR.LEFT +
+				(input.p[PL.TETR]['right'].justPressed)*X_DIR.RIGHT;
+		}
 		tetr.x_dir =
 			(input.p[PL.TETR]['left'].isDown)*X_DIR.LEFT +
 			(input.p[PL.TETR]['right'].isDown)*X_DIR.RIGHT;
-		if (input.p[PL.TETR]['up'].justReleased) tetr.to_rotate = true;
+		if (input.p[PL.TETR]['up'].justPressed) tetr.to_rotate = true;
 		// For Snake
-		if (input.p[0]['down'].justReleased) {
+		if (input.p[0]['down'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('down');
 			}
-		} else if (input.p[0]['up'].justReleased) {
+		} else if (input.p[0]['up'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('up');
 			}
-		} else if (input.p[0]['left'].justReleased) {
+		} else if (input.p[0]['left'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('left');
 			} else {
 				snake_spawner.set_player_choice('left');
 			}
-		} if (input.p[0]['right'].justReleased) {
+		} if (input.p[0]['right'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('right');
 			} else {
@@ -254,12 +261,15 @@ function tetr_rotate() {
 }
 
 function tetr_shift() {
-	if (tetr.x_dir === X_DIR.NONE) return;
+	let x_dir = (tetr.x_dir === X_DIR.NONE) ? tetr_jp_dir : tetr.x_dir;
+	if (x_dir === X_DIR.NONE) return;
+	tetr_jp_dir = X_DIR.NONE;
+
 	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
 		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
 	let blockers = ['wall', 'floor', MINO_TYPE.STILL, MINO_TYPE.HEAVY,
 		MINO_TYPE.DEAD];
-	let np = tetr.move(tetr.x_dir === X_DIR.LEFT ? 'left' : 'right');
+	let np = tetr.move(x_dir === X_DIR.LEFT ? 'left' : 'right');
 	let cs = _.filter(grid.collide(np), (p) => {
 		return p[0] !== MINO_TYPE.ACTIVE;
 	});
@@ -272,7 +282,7 @@ function tetr_shift() {
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
 			let f = fruit_find(fx, fy);
-			f.move(tetr.x_dir === X_DIR.LEFT ? 'left' : 'right');
+			f.move(x_dir === X_DIR.LEFT ? 'left' : 'right');
 		}
 	}
 	grid.set(tetr.minos, MINO_TYPE.EMPTY);
@@ -359,6 +369,7 @@ function draw_snake_d() {
 
 function set_score(val) {
 	score += parseInt(val);
+	if (lvl === LVL_DELAY.length - 1) return;
 	if (parseInt(score / 500) > lvl) {
 		clk.delay = LVL_DELAY[++lvl];
 	}
@@ -381,7 +392,8 @@ function erase_lines() {
 		for (let c = 0; c < grid.w; ++c) {
 			for (let r = full[i]; r > 0; --r) {
 				if (grid.g[r][c] === MINO_TYPE.HEAVY) {
-					if (r + 1 < grid.h) grid.set([[c, r+1]], MINO_TYPE.EMPTY);
+					if (r + 1 < grid.h && grid.g[r + 1][c] !== MINO_TYPE.HEAVY)
+						grid.set([[c, r+1]], MINO_TYPE.EMPTY);
 					break;
 				}
 				if (!blk.concat(MINO_TYPE.EMPTY).includes(grid.g[r][c]))
