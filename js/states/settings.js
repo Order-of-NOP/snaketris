@@ -2,21 +2,18 @@
 
 let settings_btn_ind = 0;
 
-const SETTINGS = {
-	GUI: {
-		BTNS: [],
-		LBL: []
-	},
-	CALLBACKS: []
-};
+const SETTINGS = new Gui();
 
 states['settings'] = {
 	create: () => {
+		SETTINGS.add_btn(
+			()=>{
+				CONFIG.FULL_SCREEN_MODE = !CONFIG.FULL_SCREEN_MODE;
+				SETTINGS.GUI.LBL[0].text = CONFIG.FULL_SCREEN_MODE ? 'ON' : 'OFF';
+			}, 'Full screen mode', TXT_STL.BTN);
+
 		// init callbacks
-		SETTINGS.CALLBACKS.push(()=>{
-			CONFIG.FULL_SCREEN_MODE = !CONFIG.FULL_SCREEN_MODE;
-			SETTINGS.GUI.LBL[0].text = CONFIG.FULL_SCREEN_MODE ? 'ON' : 'OFF';
-		});
+		SETTINGS.CALLBACKS.push();
 
 		SETTINGS.CALLBACKS.push(()=>{ game.state.start('ctrls'); });
 
@@ -39,23 +36,7 @@ states['settings'] = {
 
 	},
 	update: () => {
-		for(let i = 0; i < input.p.length; i++) {
-			let ip = input.p[i];
-			if (ip['down'].justReleased){
-				SETTINGS.GUI.BTNS[settings_btn_ind].choose(1);
-				settings_btn_ind = MOD(settings_btn_ind, 1, SETTINGS.GUI.BTNS.length);
-				SETTINGS.GUI.BTNS[settings_btn_ind].choose(0);
-			} else 
-			if (ip['up'].justReleased){
-				SETTINGS.GUI.BTNS[settings_btn_ind].choose(1);
-				settings_btn_ind = MOD(settings_btn_ind, -1, SETTINGS.GUI.BTNS.length);
-				SETTINGS.GUI.BTNS[settings_btn_ind].choose(0);
-			} else
-			if (ip['right'].justReleased) {
-				SETTINGS.GUI.BTNS[settings_btn_ind].choose(0);
-				SETTINGS.CALLBACKS[settings_btn_ind]();
-			}
-		}
+		SETTINGS.btn_choose();
 	},
 	shutdown: () => {
 		LAST_GAME_STATE = 'settings';

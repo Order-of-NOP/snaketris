@@ -14,13 +14,6 @@ const TXT_STL = {
     LBL_SCR: TxtStyle('Arial', '18px', '#ccc')
 };
 
-function clear_gui(GUI)
-{
-    for(let key in GUI) {
-        _.each(GUI[key], (e)=>{ e.destroy(); });
-        GUI[key] = [];
-    }
-}
 
 class ButtonLabel
 {
@@ -70,6 +63,12 @@ class ButtonLabel
         this.lbl.centerY = this.btn.centerY;
     }
 
+    set_x(_x)
+    {
+        this.btn.position.x = _x;
+        this.__center();
+    }
+
     center_x(_y)
     {
         if (typeof(_y) !== 'number') {
@@ -84,5 +83,73 @@ class ButtonLabel
     {
         this.btn.destroy();
         this.lbl.destroy();
+    }
+}
+
+class Gui
+{
+    constructor() {
+        this.GUI = {
+            BTNS: [],
+            LBLS: [],
+        }
+        this.CLLBCKS = [];
+        this.select_ind = 0;
+        this.__Y0 = 120;
+        this.__stepY = 60;
+    }
+
+    set_x(_x) {
+        _.each(this.GUI.BTNS, (e)=>{ e.set_x(_x); });
+        _.each(this.GUI.LBLS, (e)=>{ e.position.x = _x; });
+    }
+
+    __choose(dir) {
+        this.GUI.BTNS[this.select_ind].choose(1);
+        this.select_ind = MOD(this.select_ind, dir, this.GUI.BTNS.length);
+        this.GUI.BTNS[this.select_ind].choose(0);
+    }
+
+    next() { this.__choose(1); }
+    prev() { this.__choose(-1); }
+    call() { this.CLLBCKS[this.select_ind](); }
+
+    add_btn(callback, text, style) {
+        this.CLLBCKS.push(callback);
+        let y = this.__Y0 + this.GUI.BTNS.length *this.__stepY;
+        this.GUI.BTNS.push( new ButtonLabel(callback, text, style, y));
+    }
+
+    add_text(x, y, text, style) {
+        this.GUI.LBLS.push(game.add.text(x, y, text, style));
+    }
+
+    init_ind() {
+        this.select_ind = 0;
+        this.GUI.BTNS[this.select_ind].choose(0);
+    }
+
+    clear() {
+        for(let key in this.GUI) {
+            _.each(this.GUI[key], (e)=>{ e.destroy(); });
+            this.GUI[key] = [];
+        }
+        this.CLLBCKS = [];
+        this.select_ind = 0;
+    }
+
+    btn_choose() {
+        for(let i = 0; i < input.p.length; i++) {
+			let ip = input.p[i];
+			if (ip['down'].justReleased){
+				this.next();
+			} else 
+			if (ip['up'].justReleased){
+				this.prev();
+			} else
+			if (ip['right'].justReleased) {
+				this.call();
+			}
+		}
     }
 }

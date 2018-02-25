@@ -19,16 +19,13 @@ let score_label;
 let pause_btn_ind = 0;
 
 // For pause
-const PAUSE = {
-	GUI: {
-		BTNS: [], // Continue btn
-	},
-	CALLBACKS: [],
-	SWITCH_KEY: null, // Key for switch between game/pause
-	SCREEN_SPRT: null,
-	TO_SETTINGS: false
-}
-let flg_choice = false;
+let PAUSE = new Gui();
+PAUSE.SWITCH_KEY  = null;
+PAUSE.SCREEN_SPRT = null;
+PAUSE.TO_SETTINGS = null;
+PAUSE.PAUSED = false;
+PAUSE.LST_PRS1 = [true, true, true];
+PAUSE.LST_PRS2 = [true, true, true];
 
 const LVL_DELAY = [100, 90, 80, 70, 60, 50];
 
@@ -105,11 +102,8 @@ states['game'] = {
 		}
 		// Esc for pause
 		if (PAUSE.SWITCH_KEY.justReleased) {
-			game.paused = !game.paused;
-			console.log('menu!');
+			game.paused = ! game.paused;
 		}
-
-		console.log('ADSs');
 	},
 	// When you swith to another state
 	shutdown: () => {
@@ -120,8 +114,7 @@ states['game'] = {
 			ticks = 0;
 			score = 0;
 		}
-		clear_gui(PAUSE.GUI);
-		PAUSE.CALLBACKS = [];
+		PAUSE.clear();
 		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();
 			PAUSE.SCREEN_SPRT = null;
@@ -142,78 +135,44 @@ states['game'] = {
 		PAUSE.SCREEN_SPRT.animations.add('simple', [5], 500, true);
 		PAUSE.SCREEN_SPRT.animations.play('simple');
 		// There is init pause menu components
-		// init callbacks
-		PAUSE.CALLBACKS.push(()=> { game.paused = false; });
-		PAUSE.CALLBACKS.push(()=>{
-			game.paused = false;
-			game.state.start('ready');
-		});
-		PAUSE.CALLBACKS.push(()=> { 
-			game.paused = false;
-			game.state.start('settings');
-			PAUSE.TO_SETTINGS = true;
-		});
-		PAUSE.CALLBACKS.push(()=> { 
-			game.paused = false;
-			game.state.start('menu');
-		});
 
-		// init buttons
-		PAUSE.GUI.BTNS.push(new ButtonLabel(
-			PAUSE.CALLBACKS[0], 'Продолжить', TXT_STL.BTN, 100));
-		PAUSE.GUI.BTNS.push(new ButtonLabel(
-			PAUSE.CALLBACKS[1], 'Заново', TXT_STL.BTN, 140));
-		PAUSE.GUI.BTNS.push(new ButtonLabel(
-			PAUSE.CALLBACKS[2], 'Опции', TXT_STL.BTN, 180));
-		PAUSE.GUI.BTNS.push(new ButtonLabel(
-			PAUSE.CALLBACKS[3], 'Главное меню', TXT_STL.BTN, 220));
+		PAUSE.add_btn(
+			()=> { game.paused = false; },
+			'Continue', TXT_STL.BTN);
+		
+		PAUSE.add_btn(
+			()=> { game.paused = false; game.state.start('ready'); },
+			'Again', TXT_STL.BTN);
+		
+		PAUSE.add_btn(
+			()=> { game.paused = false; game.state.start('settings'); },
+			'Settings', TXT_STL.BTN);
+
+		PAUSE.add_btn(
+			()=> { game.paused = false; game.state.start('menu'); },
+			'Main menu', TXT_STL.BTN);
 	},
 	pauseUpdate: () => {
 		// Esc for pause
 		if (PAUSE.SWITCH_KEY.justReleased) {
 			game.paused = !game.paused;
 		}
-		// for menu
-		for(let i = 0; i < input.p.length; i++) {
-			let ip = input.p[i];
-			if (!flg_choice) {
-				if (ip['down'].isDown){
-					flg_choice = true;;
-				} else 
-				if (ip['up'].isDown){
-					flg_choice = true;
-				} else
-				if (ip['right'].isDown) {
-					flg_choice = true;
-				}
-			}
-		}
-		for(let i = 0; i < input.p.length; i++) {
-			let ip = input.p[i];
-			if (ip['down'].justReleased){
-				if (flg_choice) {
-					PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
-					pause_btn_ind = MOD(pause_btn_ind, 1, PAUSE.GUI.BTNS.length);
-					PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
-					flg_choice = false;
-				}
-			} else 
-			if (ip['up'].justReleased){
-				if(flg_choice) {
-					PAUSE.GUI.BTNS[pause_btn_ind].choose(1);
-					pause_btn_ind = MOD(pause_btn_ind, -1, PAUSE.GUI.BTNS.length);
-					PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
-					flg_choice = false;
-				}
-			} else
-			if (ip['right'].isDown) {
-				PAUSE.GUI.BTNS[pause_btn_ind].choose(0);
-				PAUSE.CALLBACKS[pause_btn_ind]();
-			}
-		}
+		let isDown;
+		isDown = input.p[0]['down'].isDown;
+		if (isDown && !PAUSE.LST_PRS1[0]) { PAUSE.next(); } PAUSE.LST_PRS1[0] = isDown;
+		isDown = input.p[0]['up'].isDown;
+		if (isDown && !PAUSE.LST_PRS1[1]) { PAUSE.prev(); } PAUSE.LST_PRS1[1] = isDown;
+		isDown = input.p[0]['right'].isDown;
+		if (isDown && !PAUSE.LST_PRS1[2]) { PAUSE.call(); } PAUSE.LST_PRS1[2] = isDown;
+		isDown = input.p[1]['down'].isDown;
+		if (isDown && !PAUSE.LST_PRS2[0]) { PAUSE.next(); } PAUSE.LST_PRS2[0] = isDown;
+		isDown = input.p[1]['up'].isDown;
+		if (isDown && !PAUSE.LST_PRS2[1]) { PAUSE.prev(); } PAUSE.LST_PRS2[1] = isDown;
+		isDown = input.p[1]['right'].isDown;
+		if (isDown && !PAUSE.LST_PRS2[2]) { PAUSE.call(); } PAUSE.LST_PRS2[2] = isDown;	
 	},
 	resumed: () => {
-		clear_gui(PAUSE.GUI);
+		PAUSE.clear();
 		PAUSE.TO_SETTINGS = false;
 		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();

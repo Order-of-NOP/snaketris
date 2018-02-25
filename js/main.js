@@ -45,8 +45,8 @@ let LAST_GAME_STATE = '';
 
 function init() {
 	const config = {
-		width: 768,
-		height: 576,
+		width: SIZE.W*TILE_SIZE,
+		height: SIZE.H*TILE_SIZE,
 		renderer: Phaser.AUTO,
 		parent: 'game',
 		antialias: true,

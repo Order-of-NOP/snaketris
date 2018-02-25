@@ -316,6 +316,10 @@ class Key {
 			return this.dev.isDown(this.keycode);
 		}
 	}
+	justReleasedT(t) {
+		if(this.key) 
+			return this.key.justReleased(t);
+	}
 	/**
 	 * Interface for Phaser's justPressed event.
 	 * @member {boolean}
