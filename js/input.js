@@ -30,15 +30,6 @@ class Input {
 		 * @member {list}
 		 */
 		this.p = [{}, {}];
-		/*_.each(cursor, (key, idx) => {
-			this.p[0][idx] = new Key(game.input.keyboard, key.keyCode);
-		});
-		this.p[1] = {
-			'up': new Key(game.input.keyboard, Phaser.KeyCode.W),
-			'down': new Key(game.input.keyboard, Phaser.KeyCode.S),
-			'left': new Key(game.input.keyboard, Phaser.KeyCode.A),
-			'right': new Key(game.input.keyboard, Phaser.KeyCode.D)
-		};*/
 		// TODO do this when pad is connected
 		this.restore();
 	}
@@ -61,47 +52,16 @@ class Input {
 		let ready = false;
 		let reset = () => {
 			game.input.keyboard.removeCallbacks();
-			// TODO create removeCallbacks in phaser.js and push
-			game.input.gamepad.addCallbacks(this, {
-				onAxis: () => {},
-				onDown: () => {}
-			});
 			console.log('done');
 		}
 		game.input.keyboard.addCallbacks(this, null, () => {
 			if (!ready) return;
 			// set a key
 			this.p[player][key_name] = new Key(
-				game.input.keyboard,
 				game.input.keyboard.lastKey.keyCode
 			);
 			reset();
 		});
-		if (this.pads_supported) {
-			game.input.gamepad.addCallbacks(this, {
-				onAxis: (pad, axis, val) => {
-					if (!ready) return;
-					this.p[player][key_name] = new Key(
-						pad,
-						val < 0 ? -1 : 1,
-						axis
-					);
-					reset();
-				},
-				onDown: (button, val, pad_idx) => {
-					if (!ready) return;
-					this.p[player][key_name] = new Key(
-						// СВЯТАЯ ДЕВА МАРИЯ, КАКОЙ ИЗВЕРГ ЭТО ПРИДУМАЛ?
-						game.input.gamepad[`pad${pad_idx+1}`],
-						button
-					);
-					reset();
-				}
-			});
-		}
-		if (!this.pads_supported) {
-			console.warn('No gamepads for you, folk.');
-		}
 		ready = true;
 		console.log('Press a key.');
 	}
@@ -155,7 +115,7 @@ class Input {
 		localStorage['ds'] = JSON.stringify(ds);
 		localStorage['ks'] = JSON.stringify(ks);
 	}
-	/** @todo load the layout from localStorage */
+	// TODO выпилить код о геймпадах
 	restore() {
 		let ds = null;
 		let ks = null;
@@ -186,14 +146,9 @@ class Input {
 				return k.p === p && k.a === a;
 			})
 			if (key !== undefined && (key.d === -1 || ds[key.d].d)) {
-				this.p[p][a] = new Key(
-					key.d === -1 ? game.input.keyboard : ds[key.d].d,
-					key.k,
-					key.ax !== null ? key.ax : undefined
-				);
+				// uh oh...
 			} else {
-				this.p[p][a] = new Key(game.input.keyboard,
-					DEFAULT_BINDS[p][a]);
+				this.p[p][a] = new Key(DEFAULT_BINDS[p][a]);
 			}
 		}
 	}
@@ -203,7 +158,20 @@ class Input {
 		localStorage.removeItem('ds');
 		this.restore();
 	}
+	debug() {
+		//let isDown = input.p[0].down.isDown;
+		//if (isDown && !last) {
+			//console.log('WHHOOOOOAAAA!!!');
+		//}
+		//last = isDown;
+		for (let a in this.p[0]) {
+			if (this.p[0][a].justPressed) console.log(`0: ${a}`);
+			if (this.p[0][a].justPressed) console.log(`1: ${a}`);
+		}
+	}
 }
+
+let last = true;
 
 /**
  * Provides an universal interface for both keyboard and gamepad event
@@ -214,88 +182,30 @@ class Input {
 class Key {
 	/**
 	 * Create a key.
-	 * @param {Phaser.Keyboard|Phaser.SinglePad} dev - device to listen to
+	 * @param {Phaser.Keyboard|Phaser.SinglePad} dev - obsolete. Can be whatever
+	 * you want, interprets as game.input.keyboard
 	 * @param {number} keycode - code of the key or a value of an axis (when
 	 * the key represents axis, should be -1 or 1 in this case)
 	 * @param {number} axis - (optional) axis number when a key is an axis
 	 */
-	constructor(dev, keycode, axis) {
+	constructor(keycode) {
 		/**
 		 * Device of this key.
 		 * @member {Phaser.Keyboard|Phaser.SinglePad}
 		 */
-		this.dev = dev;
+		this.dev = game.input.keyboard;
 		/**
-		 * Axis number when a key is an axis.
-		 * @member {boolean}
+		 * When [Key.dev]{@link Key#dev} is a Phaser.Keyboard this is the
+		 * Phaser.Key object corresponding to this key.
+		 * @member {Phaser.Key|null}
 		 */
-		this.axis = null;
-		if (dev === game.input.keyboard) {
-			/**
-			 * When [Key.dev]{@link Key#dev} is a Phaser.Keyboard this is the
-			 * Phaser.Key object corresponding to this key.
-			 * @member {Phaser.Key|null}
-			 */
-			this.key = dev.addKey(keycode);
-			/**
-			 * When [Key.dev]{@link Key#dev} is a Phaser.SinglePad this is the
-			 * keycode corresponding to this key.
-			 * @member {number|null}
-			 */
-			this.keycode = null;
-		} else {
-			this.keycode = keycode;
-			this.key = null;
-			this.axis = axis === undefined ? null : axis;
-		}
-
-		// seems like SinglePad's default justReleased is a piece of crap
-		// so this is an alterantive representation that works as expected
-		if (this.dev !== game.input.keyboard && this.axis === null) {
-			this._butJR = false;
-			dev.addCallbacks(this, {
-				onUp: (btn, val) => {
-					if (btn !== this.keycode) return;
-					this._butJR = true;
-					let timer = game.time.create();
-					timer.add(250, () => {
-						this._butJR = false;
-					}, this);
-					timer.start();
-				}
-			});
-		}
-
-		// our brand new justReleased hack for axes
-		if (this.axis !== null) {
-			// a value for justReleased to be returned
-			this._axisJR = false;
-			// previous value is needed to compute a direction of
-			// an axis' movement
-			this._last_axis = 0;
-			dev.addCallbacks(this, {
-				onAxis: (pad, axis, value) => {
-					// can this really happen? 0_o
-					if (pad !== dev) return;
-					if (axis !== this.axis) return;
-					if (value !== 0) {
-						this._last_axis = value;
-						return;
-					}
-					// computing a direction
-					if (this._last_axis * this.keycode < 0) return;
-					this._last_axis = value;
-					if (!this.isDown && !this._axisJR) {
-						this._axisJR = true;
-						let timer = game.time.create();
-						timer.add(250, () => {
-							this._axisJR = false;
-						}, this);
-						timer.start()
-					}
-				}
-			});
-		}
+		this.key = this.dev.addKey(keycode);
+		/**
+		 * When [Key.dev]{@link Key#dev} is a Phaser.SinglePad this is the
+		 * keycode corresponding to this key.
+		 * @member {number|null}
+		 */
+		this.keycode = null;
 	}
 	/**
 	 * Interface for Phaser's isDown event.
@@ -316,9 +226,12 @@ class Key {
 			return this.dev.isDown(this.keycode);
 		}
 	}
-	justReleasedT(t) {
-		if(this.key) 
-			return this.key.justReleased(t);
+	get isUp() {
+		if (this.key) {
+			return this.key.isUp;
+		} else {
+			console.warn('No gamepads, man!');
+		}
 	}
 	/**
 	 * Interface for Phaser's justPressed event.
@@ -337,6 +250,13 @@ class Key {
 			let jr = this._butJR;
 			this._butJR = false;
 			return jr;
+		}
+	}
+	get justPressed() {
+		if (this.key) {
+			return this.key.justPressed();
+		} else {
+			console.warn('Look at all this fusks I don\'t give!');
 		}
 	}
 	/** @todo return a string representation of a key */

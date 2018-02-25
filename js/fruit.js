@@ -80,7 +80,7 @@ class Fruit
 			let c = cs[0][0];
 			if (blockers.concat('floor', 'ceil').includes(c)) {
 				if (!!pwr) {
-					// TODO smash this fruit!
+					grid.animate(this.x, this.y, 'explode');
 					grid.set([this.p], MINO_TYPE.EMPTY);
 					this.destroy();
 					return;
@@ -106,7 +106,7 @@ class Fruit
 			/* we have only snake left */
 			// TODO food the snake
 			if (!!pwr) {
-				// TODO smash this fruit!
+				grid.animate(this.x, this.y, 'explode');
 				grid.set([this.p], MINO_TYPE.EMPTY);
 				this.destroy();
 				return;
@@ -123,7 +123,7 @@ class Fruit
 			}
 			let c = cs[0][0];
 			if (blockers.concat(['wall', MINO_TYPE.SNAKE]).includes(c)) {
-				// TODO smash this fruit!
+				grid.animate(this.x, this.y, 'explode', dir[0]);
 				grid.set([this.p], MINO_TYPE.EMPTY);
 				this.destroy();
 				return;

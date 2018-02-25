@@ -4,6 +4,7 @@ let clk = null;
 let ticks = 0;
 let snake;
 let tetr;
+let tetr_jp_dir = X_DIR.NONE;
 // active fruit
 let fruit = [];
 // dead snake 
@@ -34,12 +35,12 @@ function spawn_tetr() {
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
 }
 
-// TODO handle pause
 states['game'] = {
 	init: () => {
 		bg_sprite = game.add.tileSprite(0, 0,
 			game.cache.getImage('background').width,
 			game.cache.getImage('background').height, 'background');
+		game.plugins.screenShake = game.plugins.add(Phaser.Plugin.ScreenShake);
 		grid = new Grid(SIZE.W, SIZE.H);
 	},
 	create: () => {
@@ -49,14 +50,12 @@ states['game'] = {
 		snake = new Snake(5, 2);
 		tetr = spawn_tetr();
 		//clk.start();
-		// TODO uncomment when making fullscreen
-		game.input.onDown.add(() => {
-			if (CONFIG.FULL_SCREEN_MODE) {
-				if (game.scale.isFullScreen) {
-					game.scale.stopFullScreen();
-				} else {
-					game.scale.startFullScreen(false);
-				}
+		game.input.onDown.add((ptr) => {
+			if (!ptr.rightButton.isDown) return;
+			if (game.scale.isFullScreen) {
+				game.scale.stopFullScreen();
+			} else {
+				game.scale.startFullScreen(false);
 			}
 		}, this);
 		snake_spawner = new SnakeSpawner(grid.g);
@@ -73,27 +72,33 @@ states['game'] = {
 		grid.set(tetr.minos, MINO_TYPE.ACTIVE);
 	},
 	update: () => {
+		//input.debug();
 		tetr.boost = input.p[PL.TETR]['down'].isDown;
+		if (tetr_jp_dir === X_DIR.NONE) {
+			tetr_jp_dir =
+				(input.p[PL.TETR]['left'].justPressed)*X_DIR.LEFT +
+				(input.p[PL.TETR]['right'].justPressed)*X_DIR.RIGHT;
+		}
 		tetr.x_dir =
 			(input.p[PL.TETR]['left'].isDown)*X_DIR.LEFT +
 			(input.p[PL.TETR]['right'].isDown)*X_DIR.RIGHT;
-		if (input.p[PL.TETR]['up'].justReleased) tetr.to_rotate = true;
+		if (input.p[PL.TETR]['up'].justPressed) tetr.to_rotate = true;
 		// For Snake
-		if (input.p[0]['down'].justReleased) {
+		if (input.p[0]['down'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('down');
 			}
-		} else if (input.p[0]['up'].justReleased) {
+		} else if (input.p[0]['up'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('up');
 			}
-		} else if (input.p[0]['left'].justReleased) {
+		} else if (input.p[0]['left'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('left');
 			} else {
 				snake_spawner.set_player_choice('left');
 			}
-		} if (input.p[0]['right'].justReleased) {
+		} if (input.p[0]['right'].justPressed) {
 			if (snake.alive) {
 				snake.set_dir('right');
 			} else {
@@ -192,6 +197,7 @@ function draw_fruit() {
 	}
 }
 
+let boost_drop = false;
 function tetr_fall(pwr) {
 	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
 		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
@@ -211,6 +217,7 @@ function tetr_fall(pwr) {
 		}
 		if (snake_body.indexOf(c) >= 0) {
 			snake.cut_on_tetr();
+			boost_drop = true;
 		}
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
@@ -243,6 +250,7 @@ function tetr_rotate() {
 		}
 		if (snake_body.indexOf(c) >= 0) {
 			snake.cut_on_tetr();
+			boost_drop = true;
 		}
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
@@ -286,12 +294,15 @@ function tetr_rotate() {
 }
 
 function tetr_shift() {
-	if (tetr.x_dir === X_DIR.NONE) return;
+	let x_dir = (tetr.x_dir === X_DIR.NONE) ? tetr_jp_dir : tetr.x_dir;
+	if (x_dir === X_DIR.NONE) return;
+	tetr_jp_dir = X_DIR.NONE;
+
 	let snake_body = [MINO_TYPE.SNAKE, MINO_TYPE.HEAD_U, MINO_TYPE.HEAD_D,
 		MINO_TYPE.HEAD_L, MINO_TYPE.HEAD_R];
 	let blockers = ['wall', 'floor', MINO_TYPE.STILL, MINO_TYPE.HEAVY,
 		MINO_TYPE.DEAD];
-	let np = tetr.move(tetr.x_dir === X_DIR.LEFT ? 'left' : 'right');
+	let np = tetr.move(x_dir === X_DIR.LEFT ? 'left' : 'right');
 	let cs = _.filter(grid.collide(np), (p) => {
 		return p[0] !== MINO_TYPE.ACTIVE;
 	});
@@ -304,7 +315,7 @@ function tetr_shift() {
 		if (c === MINO_TYPE.FRUIT) {
 			let [fx, fy] = np[n];
 			let f = fruit_find(fx, fy);
-			f.move(tetr.x_dir === X_DIR.LEFT ? 'left' : 'right');
+			f.move(x_dir === X_DIR.LEFT ? 'left' : 'right');
 		}
 	}
 	grid.set(tetr.minos, MINO_TYPE.EMPTY);
@@ -348,6 +359,7 @@ function draw_snake() {
 			grid.set(skin, MINO_TYPE.EMPTY);
 			snake_d = snake_d.concat(skin);
 			np.splice(n);
+			boost_drop = true;
 			break;
 		}
 	}
@@ -390,6 +402,7 @@ function draw_snake_d() {
 
 function set_score(val) {
 	score += parseInt(val);
+	if (lvl === LVL_DELAY.length - 1) return;
 	if (parseInt(score / 500) > lvl) {
 		clk.delay = LVL_DELAY[++lvl];
 	}
@@ -412,7 +425,8 @@ function erase_lines() {
 		for (let c = 0; c < grid.w; ++c) {
 			for (let r = full[i]; r > 0; --r) {
 				if (grid.g[r][c] === MINO_TYPE.HEAVY) {
-					if (r + 1 < grid.h) grid.set([[c, r+1]], MINO_TYPE.EMPTY);
+					if (r + 1 < grid.h && grid.g[r + 1][c] !== MINO_TYPE.HEAVY)
+						grid.set([[c, r+1]], MINO_TYPE.EMPTY);
 					break;
 				}
 				if (!blk.concat(MINO_TYPE.EMPTY).includes(grid.g[r][c]))
@@ -422,8 +436,10 @@ function erase_lines() {
 			}
 			grid.set([[c, 0]], MINO_TYPE.EMPTY);
 		}
+		grid.animate(0, full[i], 'lightning');
 	}
 	set_score(40*(lvl+1) + 20*(full.length - 1));
+	game.plugins.screenShake.shake(16);
 	for (let r = 0; r < grid.h; ++r)
 	for (let c = 0; c < grid.w; ++c) {
 		if (grid.g[r][c] === MINO_TYPE.DEAD) {
@@ -432,11 +448,24 @@ function erase_lines() {
 	}
 }
 
+function game_over() {
+	for (let i = 0; i < grid.w; ++i) {
+		if (grid.g[0][i] === MINO_TYPE.STILL) {
+			console.log('GAME OVER!');
+			// TODO jump to game over state
+		}
+	}
+}
+
 function tick() {
 	erase_lines();
+	game_over();
 	if (ticks % SPEED.TETR_ROTATE === 0) tetr_rotate();
 	if (ticks % SPEED.TETR_SHIFT === 0) tetr_shift();
-	if (ticks % (tetr.boost ? SPEED.TETR_BOOST : SPEED.TETR) === 0) {
+	if (ticks % (tetr.boost && !boost_drop ? SPEED.TETR_BOOST
+		: SPEED.TETR) === 0)
+	{
+		boost_drop = false;
 		tetr_fall(tetr.boost);
 	}
 	if (ticks % SPEED.SNAKE == 0) {
