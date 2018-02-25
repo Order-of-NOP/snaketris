@@ -27,6 +27,7 @@ PAUSE.TO_SETTINGS = null;
 PAUSE.PAUSED = false;
 PAUSE.LST_PRS1 = [true, true, true];
 PAUSE.LST_PRS2 = [true, true, true];
+PAUSE.GAMEOVER = false;
 
 const LVL_DELAY = [100, 90, 80, 70, 60, 50];
 
@@ -64,9 +65,10 @@ states['game'] = {
 			fruit = [];
 			snake_d = [];
 			lvl = 0;
+			score = 0;
 			grid._cbs = {};
 		});
-
+		
 		score_label = game.add.text(10, 10, "SCORE: ", TXT_STL.LBL_SCR);
 
 		grid.set(tetr.minos, MINO_TYPE.ACTIVE);
@@ -140,22 +142,47 @@ states['game'] = {
 		PAUSE.SCREEN_SPRT.animations.add('simple', [5], 500, true);
 		PAUSE.SCREEN_SPRT.animations.play('simple');
 		// There is init pause menu components
+		if (!PAUSE.GAMEOVER) {
+			PAUSE.add_btn(
+				()=> { game.paused = false; grid.clear(); },
+				'Continue', TXT_STL.BTN);
+			
+			PAUSE.add_btn(
+				()=> { game.paused = false; game.state.start('ready'); grid.clear(); },
+				'Again', TXT_STL.BTN);
+			
+			PAUSE.add_btn(
+				()=> { game.paused = false; game.state.start('settings');  },
+				'Settings', TXT_STL.BTN);
 
-		PAUSE.add_btn(
-			()=> { game.paused = false; },
-			'Continue', TXT_STL.BTN);
-		
-		PAUSE.add_btn(
-			()=> { game.paused = false; game.state.start('ready'); },
-			'Again', TXT_STL.BTN);
-		
-		PAUSE.add_btn(
-			()=> { game.paused = false; game.state.start('settings'); },
-			'Settings', TXT_STL.BTN);
+			PAUSE.add_btn(
+				()=> { game.paused = false; game.state.start('menu'); grid.clear(); },
+				'Main menu', TXT_STL.BTN);
+		} else {
+			PAUSE.add_text(
+				game.world.centerX - 100,
+				100,
+				'Game over',
+				TXT_STL.LBL_TTL);
+			PAUSE.add_text(
+				game.world.centerX - 80,
+				200,
+				'Your score: ' + score,
+				TXT_STL.BTN);
+			PAUSE.__Y0 = 300;// margin top for buttons
 
-		PAUSE.add_btn(
-			()=> { game.paused = false; game.state.start('menu'); },
-			'Main menu', TXT_STL.BTN);
+			PAUSE.add_btn(()=>{
+				game.paused = false;
+				game.state.start('ready');
+				grid.clear(); 
+			}, 'Again', TXT_STL.BTN);
+
+			PAUSE.add_btn(()=>{
+				game.paused = false;
+				game.state.start('menu');
+				grid.clear(); 
+			}, 'Main menu', TXT_STL.BTN);
+		}
 	},
 	pauseUpdate: () => {
 		// Esc for pause
@@ -168,7 +195,7 @@ states['game'] = {
 		isDown = input.p[0]['up'].isDown;
 		if (isDown && !PAUSE.LST_PRS1[1]) { PAUSE.prev(); } PAUSE.LST_PRS1[1] = isDown;
 		isDown = input.p[0]['right'].isDown;
-		if (isDown && !PAUSE.LST_PRS1[2]) { PAUSE.call(); } PAUSE.LST_PRS1[2] = isDown;
+		if (isDown && !PAUSE.LST_PRS1[2]) { PAUSE.call(); console.log('asdlkjnasdkjn'); } PAUSE.LST_PRS1[2] = isDown;
 		isDown = input.p[1]['down'].isDown;
 		if (isDown && !PAUSE.LST_PRS2[0]) { PAUSE.next(); } PAUSE.LST_PRS2[0] = isDown;
 		isDown = input.p[1]['up'].isDown;
@@ -451,7 +478,8 @@ function erase_lines() {
 function game_over() {
 	for (let i = 0; i < grid.w; ++i) {
 		if (grid.g[0][i] === MINO_TYPE.STILL) {
-			console.log('GAME OVER!');
+			PAUSE.GAMEOVER = true;
+			game.paused = true;
 			// TODO jump to game over state
 		}
 	}
