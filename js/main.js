@@ -38,7 +38,8 @@ function MOD(a, b, c) {
 }
 
 const CONFIG = {
-	FULL_SCREEN_MODE: false
+	FULL_SCREEN_MODE: false,
+	SOUND_MUTE: false
 };
 
 let LAST_GAME_STATE = '';
