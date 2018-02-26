@@ -3,44 +3,47 @@
 let settings_btn_ind = 0;
 
 const SETTINGS = new Gui();
+const CFG_TXT = {
+	ON_OFF: ['ON', 'OFF'],
+	FLL_SCRN_MD: 'Full screen mode: ',
+	SND_MT: 'Sound mute: '
+};
 
 states['settings'] = {
 	create: () => {
 		SETTINGS.add_btn(
 			()=>{
+				// switch global config
 				CONFIG.FULL_SCREEN_MODE = !CONFIG.FULL_SCREEN_MODE;
-				SETTINGS.GUI.LBL[0].text = CONFIG.FULL_SCREEN_MODE ? 'ON' : 'OFF';
-			}, 'Full screen mode', TXT_STL.BTN);
+				SETTINGS.GUI.BTNS[0].lbl.text = CFG_TXT.FLL_SCRN_MD;
+				SETTINGS.GUI.BTNS[0].lbl.text += 
+					CONFIG.FULL_SCREEN_MODE ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1];
+			}, CFG_TXT.FLL_SCRN_MD + (CONFIG.FULL_SCREEN_MODE ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1]), TXT_STL.BTN);
 
-		// init callbacks
-		SETTINGS.CALLBACKS.push();
+		SETTINGS.add_btn(
+			()=>{
+				// switch global config
+				CONFIG.SOUND_MUTE = !CONFIG.SOUND_MUTE;
+				SETTINGS.GUI.BTNS[1].lbl.text = CFG_TXT.SND_MT;
+				SETTINGS.GUI.BTNS[1].lbl.text += 
+					CONFIG.SOUND_MUTE ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1];
+			}, CFG_TXT.SND_MT + (CONFIG.SOUND_MUTE ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1]), TXT_STL.BTN);
+	
+		/*SETTINGS.add_btn(()=>{
+			game.state.start('ctrls');
+		}, 'Controls', TXT_STL.BTN);*/
 
-		SETTINGS.CALLBACKS.push(()=>{ game.state.start('ctrls'); });
+		SETTINGS.add_btn(()=>{
+			game.state.start(LAST_GAME_STATE);
+		}, 'Back', TXT_STL.BTN);
 
-		SETTINGS.CALLBACKS.push(()=>{ game.state.start(LAST_GAME_STATE); });
-
-		// states button
-		SETTINGS.GUI.BTNS.push(new ButtonLabel(
-			SETTINGS.CALLBACKS[0], 'Full screen mode:', TXT_STL.BTN, 100 ));
-
-		SETTINGS.GUI.BTNS.push(new ButtonLabel(
-			SETTINGS.CALLBACKS[1], 'controls', TXT_STL.BTN, 200));
-
-		SETTINGS.GUI.BTNS.push(new ButtonLabel(
-			SETTINGS.CALLBACKS[2], 'back', TXT_STL.BTN, 0 ));
-		SETTINGS.GUI.BTNS[2].back();
-
-		// label
-		SETTINGS.GUI.LBL.push( 
-			game.add.text(game.world.centerX + 160, 105, 'OFF', TXT_STL.BTN));
-
+		SETTINGS.GUI.BTNS[SETTINGS.GUI.BTNS.length - 1].back();
 	},
 	update: () => {
 		SETTINGS.btn_choose();
 	},
 	shutdown: () => {
 		LAST_GAME_STATE = 'settings';
-		SETTINGS.STATES = [];
-		clear_gui(SETTINGS.GUI);
+		SETTINGS.clear();
 	}
 };
