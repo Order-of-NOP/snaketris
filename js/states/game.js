@@ -126,9 +126,10 @@ states['game'] = {
 			grid.clear();
 			ticks = 0;
 			score = 0;
+		} else {
+			PAUSE.clear();
+			clear_pause();
 		}
-		PAUSE.clear();
-		clear_pause();
 		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();
 			PAUSE.SCREEN_SPRT = null;
@@ -158,19 +159,20 @@ states['game'] = {
 				}, 'Continue', TXT_STL.BTN);
 			
 			PAUSE.add_btn(()=> {
-				 pause();
 				 grid.clear();
+				 pause();
 				 st('ready');
 			}, 'Again', TXT_STL.BTN);
 			
-			/*PAUSE.add_btn(()=> { 
+			PAUSE.add_btn(()=> { 
+				PAUSE.TO_SETTINGS = true;
 				pause();
 				st('settings');
-			}, 'Settings', TXT_STL.BTN);*/
+			}, 'Settings', TXT_STL.BTN);
 
 			PAUSE.add_btn(()=> { 
-				pause();
 				grid.clear();
+				pause();
 				st('menu');
 			}, 'Main menu', TXT_STL.BTN);
 
@@ -225,8 +227,10 @@ states['game'] = {
 		if (isDown && !PAUSE.LST_PRS2[2]) { PAUSE.call(); } F2(2);
 	},
 	resumed: () => {
+		if (!PAUSE.TO_SETTINGS) {
+			clear_pause();
+		}
 		PAUSE.clear();
-		//clear_pause();
 		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();
 			PAUSE.SCREEN_SPRT = null;
