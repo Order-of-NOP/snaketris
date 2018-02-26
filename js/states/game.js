@@ -29,6 +29,14 @@ PAUSE.LST_PRS1 = [true, true, true];
 PAUSE.LST_PRS2 = [true, true, true];
 PAUSE.GAMEOVER = false;
 
+function clear_pause() {
+	PAUSE.TO_SETTINGS = null;
+	PAUSE.PAUSED = false;
+	PAUSE.LST_PRS1 = [true, true, true];
+	PAUSE.LST_PRS2 = [true, true, true];
+	PAUSE.GAMEOVER = false;
+}
+
 const LVL_DELAY = [100, 90, 80, 70, 60, 50];
 
 function spawn_tetr() {
@@ -114,13 +122,13 @@ states['game'] = {
 	// When you swith to another state
 	shutdown: () => {
 		LAST_GAME_STATE = 'game';
-		flg_choice = false;
-		if (PAUSE.TO_SETTINGS) {
+		if (!PAUSE.TO_SETTINGS) {
 			grid.clear();
 			ticks = 0;
 			score = 0;
 		}
 		PAUSE.clear();
+		clear_pause();
 		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();
 			PAUSE.SCREEN_SPRT = null;
@@ -142,44 +150,56 @@ states['game'] = {
 		PAUSE.SCREEN_SPRT.animations.play('simple');
 		// There is init pause menu components
 		if (!PAUSE.GAMEOVER) {
-			PAUSE.add_btn(
-				()=> { game.paused = false; grid.clear(); },
-				'Continue', TXT_STL.BTN);
+			let pause = () => { game.paused = false; }
+			let st = state => game.state.start(state); 
+			PAUSE.__Y0 = 120;
+			PAUSE.add_btn(()=> {
+				 pause();
+				}, 'Continue', TXT_STL.BTN);
 			
-			PAUSE.add_btn(
-				()=> { game.paused = false; game.state.start('ready'); grid.clear(); },
-				'Again', TXT_STL.BTN);
+			PAUSE.add_btn(()=> {
+				 pause();
+				 grid.clear();
+				 st('ready');
+			}, 'Again', TXT_STL.BTN);
 			
-			PAUSE.add_btn(
-				()=> { game.paused = false; game.state.start('settings');  },
-				'Settings', TXT_STL.BTN);
+			/*PAUSE.add_btn(()=> { 
+				pause();
+				st('settings');
+			}, 'Settings', TXT_STL.BTN);*/
 
-			PAUSE.add_btn(
-				()=> { game.paused = false; game.state.start('menu'); grid.clear(); },
-				'Main menu', TXT_STL.BTN);
+			PAUSE.add_btn(()=> { 
+				pause();
+				grid.clear();
+				st('menu');
+			}, 'Main menu', TXT_STL.BTN);
+
 		} else {
+
 			PAUSE.add_text(
 				game.world.centerX - 100,
 				100,
 				'Game over',
 				TXT_STL.LBL_TTL);
+
 			PAUSE.add_text(
 				game.world.centerX - 80,
 				200,
 				'Your score: ' + score,
 				TXT_STL.BTN);
+
 			PAUSE.__Y0 = 300;// margin top for buttons
 
 			PAUSE.add_btn(()=>{
 				game.paused = false;
-				game.state.start('ready');
-				grid.clear(); 
+				grid.clear();
+				game.state.start('ready'); 
 			}, 'Again', TXT_STL.BTN);
 
 			PAUSE.add_btn(()=>{
 				game.paused = false;
-				game.state.start('menu');
 				grid.clear(); 
+				game.state.start('menu');
 			}, 'Main menu', TXT_STL.BTN);
 		}
 	},
@@ -189,22 +209,24 @@ states['game'] = {
 			game.paused = !game.paused;
 		}
 		let isDown;
+		let F1 = i => { PAUSE.LST_PRS1[i] = isDown; } 
+		let F2 = i => { PAUSE.LST_PRS2[i] = isDown; } 
 		isDown = input.p[0]['down'].isDown;
-		if (isDown && !PAUSE.LST_PRS1[0]) { PAUSE.next(); } PAUSE.LST_PRS1[0] = isDown;
+		if (isDown && !PAUSE.LST_PRS1[0]) { PAUSE.next(); } F1(0);
 		isDown = input.p[0]['up'].isDown;
-		if (isDown && !PAUSE.LST_PRS1[1]) { PAUSE.prev(); } PAUSE.LST_PRS1[1] = isDown;
+		if (isDown && !PAUSE.LST_PRS1[1]) { PAUSE.prev(); } F1(1);
 		isDown = input.p[0]['right'].isDown;
-		if (isDown && !PAUSE.LST_PRS1[2]) { PAUSE.call(); console.log('asdlkjnasdkjn'); } PAUSE.LST_PRS1[2] = isDown;
+		if (isDown && !PAUSE.LST_PRS1[2]) { PAUSE.call(); } F1(2);
 		isDown = input.p[1]['down'].isDown;
-		if (isDown && !PAUSE.LST_PRS2[0]) { PAUSE.next(); } PAUSE.LST_PRS2[0] = isDown;
+		if (isDown && !PAUSE.LST_PRS2[0]) { PAUSE.next(); } F2(0);
 		isDown = input.p[1]['up'].isDown;
-		if (isDown && !PAUSE.LST_PRS2[1]) { PAUSE.prev(); } PAUSE.LST_PRS2[1] = isDown;
+		if (isDown && !PAUSE.LST_PRS2[1]) { PAUSE.prev(); } F2(1);
 		isDown = input.p[1]['right'].isDown;
-		if (isDown && !PAUSE.LST_PRS2[2]) { PAUSE.call(); } PAUSE.LST_PRS2[2] = isDown;	
+		if (isDown && !PAUSE.LST_PRS2[2]) { PAUSE.call(); } F2(2);
 	},
 	resumed: () => {
 		PAUSE.clear();
-		PAUSE.TO_SETTINGS = false;
+		//clear_pause();
 		if (PAUSE.SCREEN_SPRT != null) {
 			PAUSE.SCREEN_SPRT.destroy();
 			PAUSE.SCREEN_SPRT = null;
