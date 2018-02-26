@@ -11,6 +11,11 @@
 	src: url('../fonts/CevicheOne-Regular.ttf');
 }
 
+@font-face {
+	font-family: Rinder;
+	src: url('../fonts/NES2.ttf');
+}
+
 html {
 	font-size: 10px;
 }
@@ -41,6 +46,7 @@ canvas {
 }
 
 #wrapper * {
+	font-family: 'Rinder';
 	user-select: none;
 }
 

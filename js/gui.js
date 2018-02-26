@@ -9,9 +9,9 @@ function TxtStyle(_ff = 'Arial', _fsz = '32px', _fc = '#fff', _fw = '', _fst = '
 }
 // there is all styles for text
 const TXT_STL = {
-    BTN: TxtStyle('Arial', '32px', '#ccc'),
-    LBL_TTL: TxtStyle('Arial', '48px', '#eee'),
-    LBL_SCR: TxtStyle('Arial', '18px', '#ccc')
+    BTN: TxtStyle('Rinder', '32px', '#ccc'),
+    LBL_TTL: TxtStyle('Rinder', '48px', '#eee'),
+    LBL_SCR: TxtStyle('Rinder', '18px', '#ccc')
 };
 
 
