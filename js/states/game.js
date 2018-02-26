@@ -43,6 +43,12 @@ states['game'] = {
 			game.cache.getImage('background').height, 'background');
 		game.plugins.screenShake = game.plugins.add(Phaser.Plugin.ScreenShake);
 		grid = new Grid(SIZE.W, SIZE.H);
+		grid.add_callback('clear', () => {
+			fruit = [];
+			snake_d = [];
+			lvl = 0;
+			score = 0;
+		});
 	},
 	create: () => {
 		let tick_time = LVL_DELAY[lvl];
@@ -61,13 +67,6 @@ states['game'] = {
 		}, this);
 		snake_spawner = new SnakeSpawner(grid.g);
 		snake_spawner.spawn('left');
-		grid.add_callback('clear', () => {
-			fruit = [];
-			snake_d = [];
-			lvl = 0;
-			score = 0;
-			grid._cbs = {};
-		});
 		
 		score_label = game.add.text(10, 10, "SCORE: ", TXT_STL.LBL_SCR);
 
@@ -452,20 +451,24 @@ function erase_lines() {
 		for (let c = 0; c < grid.w; ++c) {
 			for (let r = full[i]; r > 0; --r) {
 				if (grid.g[r][c] === MINO_TYPE.HEAVY) {
-					if (r + 1 < grid.h && grid.g[r + 1][c] !== MINO_TYPE.HEAVY)
+					if (r + 1 < grid.h && grid.g[r + 1][c] !== MINO_TYPE.HEAVY) {
 						grid.set([[c, r+1]], MINO_TYPE.EMPTY);
+					}
 					break;
 				}
 				if (!blk.concat(MINO_TYPE.EMPTY).includes(grid.g[r][c]))
 					continue;
-				grid.set([[c, r]], (blk.includes(grid.g[r-1][c]))
+				grid.set([[c, r]],
+					[MINO_TYPE.STILL, MINO_TYPE.DEAD].includes(grid.g[r-1][c])
 					? grid.g[r-1][c] : MINO_TYPE.EMPTY);
 			}
 			grid.set([[c, 0]], MINO_TYPE.EMPTY);
 		}
+		// visuals
 		grid.animate(0, full[i], 'lightning');
 	}
 	set_score(40*(lvl+1) + 20*(full.length - 1));
+	// more visuals
 	game.plugins.screenShake.shake(16);
 	for (let r = 0; r < grid.h; ++r)
 	for (let c = 0; c < grid.w; ++c) {
