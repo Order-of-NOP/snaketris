@@ -11,7 +11,9 @@ function TxtStyle(_ff = 'Arial', _fsz = '32px', _fc = '#fff', _fw = '', _fst = '
 const TXT_STL = {
     BTN: TxtStyle('Rinder', '32px', '#ccc'),
     LBL_TTL: TxtStyle('Rinder', '48px', '#eee'),
-    LBL_SCR: TxtStyle('Rinder', '18px', '#ccc')
+    LBL_SCR: TxtStyle('Rinder', '24px', '#ccc'),
+    LBL_SNK: TxtStyle('Rinder', '24px', '#f00'),
+    LBL_TTR: TxtStyle('Rinder', '24px', '#0f0'),
 };
 
 
@@ -25,7 +27,7 @@ class ButtonLabel
         this.btn.height = this.lbl.height < 50 ? 50 : this.lbl.height;
         this.btn.alpha = 0.0;
         this.center_x(y);
-        this.colors = [0xaa55aa, 0xffffff, 0xafaf77];
+        this.colors = [0xff00ff, 0xffffff, 0x00ffff];
         // creating animation on over and out
         this.btn.events.onInputOver.add(()=>{
             this.lbl.tint = this.colors[0];

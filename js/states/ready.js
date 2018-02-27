@@ -8,20 +8,28 @@ const READY_GUI = {
 const READY = new Gui();
 
 const READY_FLGS = [ false, false ];
-const READY_LBLS = ['READY', 'NOT READY'];
+const READY_LBLS = ['READY', ''];
 
-const TIME_DELAY = 3000;
+const TIME_DELAY = 0;
 
 let RDY_TIME = null;
 
 states['ready'] = {
+	init: () => {
+		bg_sprite = game.add.tileSprite(0, 0,
+			game.cache.getImage('background').width,
+			game.cache.getImage('background').height, 'background');
+	},
 	create: () => {
+		READY.add_text(100, 170, 'Snake', TXT_STL.LBL_SNK);
+		READY.add_text(400, 170, 'Block', TXT_STL.LBL_TTR);
 		READY.add_text(100, 200, 'Press any key', TXT_STL.LBL_SCR);
 		READY.add_text(400, 200, 'Press any key', TXT_STL.LBL_SCR);
 
 		READY.add_text(0, 0, '', TXT_STL.LBL_TTL);
-		READY.GUI.LBLS[2].centerX = game.world.centerX;
-		READY.GUI.LBLS[2].centerY = game.world.centerY - 200;
+		READY.count_label = _.last(READY.GUI.LBLS);
+		READY.count_label.centerX = game.world.centerX;
+		READY.count_label.centerY = game.world.centerY - 200;
 
 		READY.add_text(100, 240, READY_LBLS[1], TXT_STL.LBL_SCR);
 		READY.add_text(400, 240, READY_LBLS[1], TXT_STL.LBL_SCR);
@@ -45,14 +53,13 @@ states['ready'] = {
 				}
 			}
 		}
-		if (RDY_TIME == null) {
+		if (RDY_TIME === null) {
 			if (READY_FLGS[0] && READY_FLGS[1]) {
-				console.log('READY!!!');
 				RDY_TIME = game.time.now + TIME_DELAY;
 			}
 		} else {
 			let time = RDY_TIME - game.time.now;
-			READY.GUI.LBLS[2].text = (time > -1 ? (time/1000).toFixed(2) : 0);
+			//READY.count_label.text = (time > -1 ? (time/1000).toFixed(2) : 0);
 			if (time < 10) {
 				game.state.start('game');
 			}

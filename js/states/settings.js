@@ -10,6 +10,11 @@ const CFG_TXT = {
 };
 
 states['settings'] = {
+	init: () => {
+		bg_sprite = game.add.tileSprite(0, 0,
+			game.cache.getImage('background').width,
+			game.cache.getImage('background').height, 'background');
+	},
 	create: () => {
 		SETTINGS.add_btn(
 			()=>{

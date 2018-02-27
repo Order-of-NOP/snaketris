@@ -2,9 +2,10 @@
 
 states['preload'] = {
 	preload: () => {
+		game.load.image('background', 'img/bg.png');
+		game.load.image('logo', 'img/logo.png');
 		game.load.spritesheet('sheet', 'img/sheet.png',
 			TILE_SIZE, TILE_SIZE);
-		game.load.image('background', 'img/bg.png');
 		game.load.spritesheet('explosion', 'img/explosion.png', 63, 42);
 		game.load.spritesheet('lightning', 'img/lightning.png', 808, 32)
 	},
