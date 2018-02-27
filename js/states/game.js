@@ -156,25 +156,25 @@ states['game'] = {
 			PAUSE.__Y0 = 120;
 			PAUSE.add_btn(()=> {
 				 pause();
-				}, 'Continue', TXT_STL.BTN);
+				}, 'Resume game', TXT_STL.BTN);
 			
 			PAUSE.add_btn(()=> {
 				 grid.clear();
 				 pause();
 				 st('ready');
-			}, 'Again', TXT_STL.BTN);
+			}, 'New game', TXT_STL.BTN);
 			
-			PAUSE.add_btn(()=> { 
-				PAUSE.TO_SETTINGS = true;
-				pause();
-				st('settings');
-			}, 'Settings', TXT_STL.BTN);
+			//PAUSE.add_btn(()=> { 
+				//PAUSE.TO_SETTINGS = true;
+				//pause();
+				//st('settings');
+			//}, 'Settings', TXT_STL.BTN);
 
 			PAUSE.add_btn(()=> { 
 				grid.clear();
 				pause();
 				st('menu');
-			}, 'Main menu', TXT_STL.BTN);
+			}, 'Quit to title', TXT_STL.BTN);
 
 		} else {
 
@@ -196,13 +196,13 @@ states['game'] = {
 				game.paused = false;
 				grid.clear();
 				game.state.start('ready'); 
-			}, 'Again', TXT_STL.BTN);
+			}, 'New game', TXT_STL.BTN);
 
 			PAUSE.add_btn(()=>{
 				game.paused = false;
 				grid.clear(); 
 				game.state.start('menu');
-			}, 'Main menu', TXT_STL.BTN);
+			}, 'Quit to title', TXT_STL.BTN);
 		}
 	},
 	pauseUpdate: () => {
