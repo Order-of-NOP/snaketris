@@ -518,8 +518,8 @@ function tick() {
 	game_over();
 	if (ticks % SPEED.TETR_ROTATE === 0) tetr_rotate();
 	if (ticks % SPEED.TETR_SHIFT === 0) tetr_shift();
-	if (ticks % (tetr.boost && (!boost_drop ? SPEED.TETR_BOOST
-		: SPEED.TETR)) === 0)
+	if (ticks % ((tetr.boost && !boost_drop) ? SPEED.TETR_BOOST
+		: SPEED.TETR) === 0)
 	{
 		boost_drop = false;
 		tetr_fall(tetr.boost);
