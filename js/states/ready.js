@@ -21,8 +21,8 @@ states['ready'] = {
 			game.cache.getImage('background').height, 'background');
 	},
 	create: () => {
-		READY.add_text(100, 170, 'Snake', TXT_STL.LBL_SNK);
-		READY.add_text(400, 170, 'Block', TXT_STL.LBL_TTR);
+		READY.add_text(400, 170, 'Snake (arrows)', TXT_STL.LBL_SNK);
+		READY.add_text(100, 170, 'Block (WASD)', TXT_STL.LBL_TTR);
 		READY.add_text(100, 200, 'Press any key', TXT_STL.LBL_SCR);
 		READY.add_text(400, 200, 'Press any key', TXT_STL.LBL_SCR);
 
