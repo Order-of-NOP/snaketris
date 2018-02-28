@@ -19,6 +19,8 @@ let score_label;
 // for switch beetwen menu with help key
 let pause_btn_ind = 0;
 
+let name_input = null;
+
 // For pause
 let PAUSE = new Gui();
 PAUSE.SWITCH_KEY  = null;
@@ -164,51 +166,49 @@ states['game'] = {
 				 st('ready');
 			}, 'New game', TXT_STL.BTN);
 			
-			//PAUSE.add_btn(()=> { 
-				//PAUSE.TO_SETTINGS = true;
-				//pause();
-				//st('settings');
-			//}, 'Settings', TXT_STL.BTN);
-
 			PAUSE.add_btn(()=> { 
 				grid.clear();
 				pause();
 				st('menu');
 			}, 'Quit to title', TXT_STL.BTN);
-
 		} else {
-
-			PAUSE.add_text(
-				game.world.centerX - 100,
-				100,
-				'Game over',
-				TXT_STL.LBL_TTL);
-
-			PAUSE.add_text(
-				game.world.centerX - 80,
-				200,
-				'Your score: ' + score,
-				TXT_STL.BTN);
-
-			PAUSE.__Y0 = 300;// margin top for buttons
-
-			PAUSE.add_btn(()=>{
-				game.paused = false;
-				grid.clear();
-				game.state.start('ready'); 
-			}, 'New game', TXT_STL.BTN);
-
-			PAUSE.add_btn(()=>{
-				game.paused = false;
-				grid.clear(); 
-				game.state.start('menu');
-			}, 'Quit to title', TXT_STL.BTN);
+			score_tab.check(score, (new_record) => {
+				x = game.world.centerX - 100;
+				PAUSE.add_text(x, 50,
+					'Game over',
+					TXT_STL.LBL_TTL
+				);
+				PAUSE.add_text(x, 200,
+					'Your score is ' + score,
+					TXT_STL.BTN
+				);
+				if (new_record) {
+					PAUSE.add_text(x + 20, 230,
+						'It\'s a new record!',
+						TXT_STL.LBL_MAGENTA
+					);
+					name_input = new InputField(x, 330);
+				}
+				PAUSE.__Y0 = 400; // margin top for buttons
+				PAUSE.add_btn(()=>{
+					if (new_record) {
+						name_input.active = false;
+						score_tab.add(score, name_input.value || 'Incognito');
+					}
+					game.paused = false;
+					grid.clear();
+					game.state.start(new_record ? 'records': 'menu'); 
+				}, 'Continue', TXT_STL.BTN);
+			});
 		}
 	},
 	pauseUpdate: () => {
 		// Esc for pause
 		if (PAUSE.SWITCH_KEY.justReleased) {
 			game.paused = !game.paused;
+		}
+		if (name_input !== null && name_input.active) {
+			return;
 		}
 		let isDown;
 		let F1 = i => { PAUSE.LST_PRS1[i] = isDown; } 
@@ -509,7 +509,6 @@ function game_over() {
 		if (grid.g[0][i] === MINO_TYPE.STILL) {
 			PAUSE.GAMEOVER = true;
 			game.paused = true;
-			// TODO jump to game over state
 		}
 	}
 }

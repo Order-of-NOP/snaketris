@@ -144,7 +144,5 @@ class SnakeSpawner {
         if (this._spawn.time < game.time.now) {
             this.stop();
         }
-
     }
-
 }

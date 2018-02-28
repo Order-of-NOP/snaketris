@@ -40,10 +40,18 @@ states['ready'] = {
 			for (let i = 0; i < 2; i++) {
 				let ip = input.p[i];
 				if (!READY_FLGS[i]) {
-					if (ip['left'].justReleased) {READY_FLGS[i] = !READY_FLGS[i];}
-					if (ip['down'].justReleased) { READY_FLGS[i] = !READY_FLGS[i]; }
-					if (ip['right'].justReleased) { READY_FLGS[i] = !READY_FLGS[i]; }
-					if (ip['up'].justReleased) { READY_FLGS[i] = !READY_FLGS[i]; }
+					if (ip['left'].justReleased) {
+						READY_FLGS[i] = !READY_FLGS[i];
+					}
+					if (ip['down'].justReleased) {
+						READY_FLGS[i] = !READY_FLGS[i];
+					}
+					if (ip['right'].justReleased) {
+						READY_FLGS[i] = !READY_FLGS[i];
+					}
+					if (ip['up'].justReleased) {
+						READY_FLGS[i] = !READY_FLGS[i];
+					}
 					
 					if (READY_FLGS[i]) {
 						READY.GUI.LBLS[offset - i].text = READY_LBLS[0];

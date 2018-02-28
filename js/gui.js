@@ -14,8 +14,9 @@ const TXT_STL = {
     LBL_SCR: TxtStyle('Rinder', '24px', '#ccc'),
     LBL_SNK: TxtStyle('Rinder', '24px', '#f00'),
     LBL_TTR: TxtStyle('Rinder', '24px', '#0f0'),
+    LBL_HIGHLIGHT: TxtStyle('Rinder', '24px', '#0ff'),
+    LBL_MAGENTA: TxtStyle('Rinder', '24px', '#f0f'),
 };
-
 
 class ButtonLabel
 {
@@ -45,7 +46,7 @@ class ButtonLabel
             console.warn('ERR, ind not number');
             return;
         }
-        if (ind != 0 && ind != 1 && ind != 2) {
+        if (!([0,1,2].includes(ind))) {
             console.warn('ERR, ind not in [0,1,2]');
             return;
         }
@@ -119,7 +120,7 @@ class Gui
     add_btn(callback, text, style) {
         this.CLLBCKS.push(callback);
         let y = this.__Y0 + this.GUI.BTNS.length *this.__stepY;
-        this.GUI.BTNS.push( new ButtonLabel(callback, text, style, y));
+        this.GUI.BTNS.push(new ButtonLabel(callback, text, style, y));
     }
 
     add_text(x, y, text, style) {
