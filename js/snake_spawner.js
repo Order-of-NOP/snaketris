@@ -42,6 +42,10 @@ class SnakeSpawner {
             return false;
         }
 
+        if(!this.check(dir)) {
+            return false;
+        }
+
         if (this._spawn.player_choice === dir) {
             this._spawn.player_confirms++;
         } else {
@@ -119,14 +123,28 @@ class SnakeSpawner {
         return false;
     }
 
+    wait() {
+        this.__spawn.time = game.time.now + this.__spawn.delay;
+    }
+
     timer_loop() {
         this.animation.alpha = (this.animation.alpha + this.animation.flash_dx) % 1;
         _.each(this.sprite, (e)=>{ e.alpha = this.animation.alpha; });
         let pos = null;
+
         if (this._spawn.player_choice === 'left') {
             pos = this.coords[this._spawn.player_choice];
         } else if (this._spawn.player_choice === 'right') {
             pos = this.coords[this._spawn.player_choice];
+        }
+
+        if (!this.check(this._spawn.player_choice)) {
+            let tmp_d = this._spawn.player_choice === 'left' ? 'right' : 'left';
+            if (!this.check(tmp_d)) {
+                this.wait();
+            } else {
+                this._spawn.player_choice = tmp_d;
+            }
         }
     
         if (pos == null) {

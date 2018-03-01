@@ -382,7 +382,9 @@ function draw_snake() {
 		grid.set(snake.seg, MINO_TYPE.EMPTY);
 		snake_d = snake_d.concat(snake.seg);
 		//adding delay and spawn option
-		snake_spawner.spawn('left');
+		if (!snake_spawner.spawn('left') && !snake_spawner.spawn('right')) {
+			snake_spawner.wait();
+		} 
 		return;
 	}
 	// get new coord
@@ -404,7 +406,9 @@ function draw_snake() {
 			grid.set(snake.seg, MINO_TYPE.EMPTY);
 			snake_d = snake_d.concat(snake.seg);
 			//adding delay and spawn option
-			snake_spawner.spawn('left');
+			if (!snake_spawner.spawn('left') && !snake_spawner.spawn('right')) {
+				snake_spawner.wait();
+			} 
 			return;
 		}
 		if (c === MINO_TYPE.ACTIVE) {
