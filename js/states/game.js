@@ -324,7 +324,8 @@ function tetr_rotate() {
 			while (_.find(np, (el) => {
 				return el[0] === nf[0] && el[1] === nf[1];
 			}) !== undefined) {
-				mv = [mv[0] === 0 ? 0 : mv[0] + 1, mv[1] === 0 ? 0 : mv[1]];
+				mv = [mv[0] === 0 ? 0 : mv[0] + Math.sign(mv[0])
+					, mv[1] === 0 ? 0 : mv[1] + Math.sign(mv[1])];
 				nf = [fx + mv[0], fy + mv[1]];
 			}
 			/* now move (collision-proof!) */
@@ -493,7 +494,7 @@ function erase_lines() {
 					[MINO_TYPE.STILL, MINO_TYPE.DEAD].includes(grid.g[r-1][c])
 					? grid.g[r-1][c] : MINO_TYPE.EMPTY);
 			}
-			grid.set([[c, 0]], MINO_TYPE.EMPTY);
+			//grid.set([[c, 0]], MINO_TYPE.EMPTY);
 		}
 		// visuals
 		grid.animate(0, full[i], 'lightning');
