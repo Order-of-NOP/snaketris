@@ -102,7 +102,11 @@ states['records'] = {
 			_.last(RECORDS.GUI.BTNS).back();
 		});
 	},
+	update: () => {
+		RECORDS.btn_choose();
+	},
 	shutdown: () => {
+		RECORDS.clear();
 		LAST_GAME_STATE = 'records';
 	}
 }

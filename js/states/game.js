@@ -123,6 +123,7 @@ states['game'] = {
 	},
 	// When you swith to another state
 	shutdown: () => {
+		pause_btn_ind = 0;
 		LAST_GAME_STATE = 'game';
 		if (!PAUSE.TO_SETTINGS) {
 			grid.clear();
