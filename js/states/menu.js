@@ -1,6 +1,5 @@
 /* states/menu.js */
 
-
 const MENU = new Gui();
 
 states['menu'] = {

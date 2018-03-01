@@ -108,6 +108,7 @@ class Gui
     }
 
     __choose(dir) {
+        if (this.GUI.BTNS.length == 0) return;
         this.GUI.BTNS[this.select_ind].choose(1);
         this.select_ind = MOD(this.select_ind, dir, this.GUI.BTNS.length);
         this.GUI.BTNS[this.select_ind].choose(0);
