@@ -6,7 +6,8 @@ const SETTINGS = new Gui();
 const CFG_TXT = {
 	ON_OFF: ['ON', 'OFF'],
 	FLL_SCRN_MD: 'Full screen mode: ',
-	SND_MT: 'Sound mute: '
+	SND_MT: 'Sound mute: ',
+	MSC_ON: 'Music: '
 };
 
 states['settings'] = {
@@ -33,6 +34,15 @@ states['settings'] = {
 				SETTINGS.GUI.BTNS[1].lbl.text += 
 					CONFIG.SOUND_MUTE ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1];
 			}, CFG_TXT.SND_MT + (CONFIG.SOUND_MUTE ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1]), TXT_STL.BTN);
+		
+		SETTINGS.add_btn(
+			()=>{
+				// switch global config
+				CONFIG.MUSIC_ON = !CONFIG.MUSIC_ON;
+				SETTINGS.GUI.BTNS[2].lbl.text = CFG_TXT.MSC_ON;
+				SETTINGS.GUI.BTNS[2].lbl.text += 
+					CONFIG.MUSIC_ON ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1];
+			}, CFG_TXT.MSC_ON + (CONFIG.MUSIC_ON ? CFG_TXT.ON_OFF[0] : CFG_TXT.ON_OFF[1]), TXT_STL.BTN);
 	
 		/*SETTINGS.add_btn(()=>{
 			game.state.start('ctrls');
