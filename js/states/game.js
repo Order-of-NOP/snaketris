@@ -468,17 +468,30 @@ function set_score(val) {
 
 function erase_lines() {
 	let full = [];
+	let heavy = [];
 	let blk = [MINO_TYPE.STILL, MINO_TYPE.DEAD, MINO_TYPE.HEAVY];
 	for (let r = 0; r < grid.h; ++r) {
 		let c;
 		for (c = 0; c < grid.w; ++c) {
 			if (!blk.includes(grid.g[r][c])) break;
 		}
-		if (c === grid.w) full.push(r);
+		if (c === grid.w) {
+			full.push(r);
+			let inters = _.intersection(blk, grid.g[r]);
+			if (inters.length === 1 && inters[0] === MINO_TYPE.HEAVY) {
+				heavy.push(r);
+			}
+		}
 	}
 	if (full.length === 0) return;
 	snake_d = [];
 	for (let i = 0; i < full.length; ++i) {
+		if (heavy.includes(full[i])) {
+			let r = full[i];
+			_.each(grid.g[r], (mino, idx) => {
+				grid.set([[idx, r]], MINO_TYPE.STILL);
+			});
+		}
 		/* running through all the columns */
 		for (let c = 0; c < grid.w; ++c) {
 			for (let r = full[i]; r > 0; --r) {
@@ -497,7 +510,9 @@ function erase_lines() {
 			//grid.set([[c, 0]], MINO_TYPE.EMPTY);
 		}
 		// visuals
-		grid.animate(0, full[i], 'lightning');
+		grid.animate(0, full[i], heavy.includes(full[i])
+			? 'crimson'
+			: 'lightning');
 	}
 	set_score(40*(lvl+1) + 20*(full.length - 1));
 	// more visuals

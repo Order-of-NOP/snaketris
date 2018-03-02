@@ -213,9 +213,9 @@ class Grid {
 				xpl.destroy();
 			});
 			xpl.play('explode');
-		} else if (anim === 'lightning') {
+		} else if (['lightning', 'crimson'].includes(anim)) {
 			let y = _y * TILE_SIZE;
-			let lght = game.add.sprite(0, y, 'lightning', 0);
+			let lght = game.add.sprite(0, y, anim, 0);
 			lght.animations.add('light', null, 30).onComplete.add(() => {
 					lght.destroy();
 				});

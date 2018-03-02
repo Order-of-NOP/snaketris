@@ -8,6 +8,7 @@ states['preload'] = {
 			TILE_SIZE, TILE_SIZE);
 		game.load.spritesheet('explosion', 'img/explosion.png', 63, 42);
 		game.load.spritesheet('lightning', 'img/lightning.png', 808, 32)
+		game.load.spritesheet('crimson', 'img/crimson.png', 808, 32)
 	},
 	create: () => {
 		// wanna do something useful on right click
