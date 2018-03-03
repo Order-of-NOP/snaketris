@@ -31,25 +31,34 @@ class ScoreTable
 		}
 	}
 	load_best(callback) {
-		this.tab = [];
-		let idx = this.db
-			.transaction(['highscores'])
-			.objectStore('highscores')
-			.index('score');
-		idx.openCursor(null, 'prev').onsuccess = (e) => {
-			let cursor = e.target.result;
-			if (cursor) {
-				this.tab.push(cursor.value);
-				if (this.tab.length >= this.len) {
-					if (callback) callback();
-					return;
-				}
-				cursor.continue();
-			} else {
+		GJAPI.ScoreFetch(0, GJAPI.SCORE_ALL, 10, (response) => {
+			if (response.scores) {
+				this.tab = _.map(response.scores, (s) => {
+					return { name: s.user || s.guest, score: parseInt(s.sort) };
+				});
 				if (callback) callback();
 				return;
 			}
-		};
+			this.tab = [];
+			let idx = this.db
+				.transaction(['highscores'])
+				.objectStore('highscores')
+				.index('score');
+			idx.openCursor(null, 'prev').onsuccess = (e) => {
+				let cursor = e.target.result;
+				if (cursor) {
+					this.tab.push(cursor.value);
+					if (this.tab.length >= this.len) {
+						if (callback) callback();
+						return;
+					}
+					cursor.continue();
+				} else {
+					if (callback) callback();
+					return;
+				}
+			};
+		});
 	}
 	check(sc, callback) {
 		this.load_best(() => {
@@ -65,6 +74,11 @@ class ScoreTable
 			this.hil.name = name;
 			this.hil.score = sc;
 		};
+		if (GJAPI.bActive && name === GJAPI.sUserName) {
+			GJAPI.ScoreAdd(0, sc, `${sc} points`);
+		} else {
+			GJAPI.ScoreAddGuest(0, sc, `${sc} points`, name);
+		}
 	}
 }
 
@@ -96,11 +110,11 @@ states['records'] = {
 					: TXT_STL.LBL_SCR);
 			}
 			score_tab.hil = {name: null, score: null};
-			RECORDS.add_btn(() => {
-				game.state.start('menu');
-			}, 'To main menu', TXT_STL.BTN);
-			_.last(RECORDS.GUI.BTNS).back();
 		});
+		RECORDS.add_btn(() => {
+			game.state.start('menu');
+		}, 'To main menu', TXT_STL.BTN);
+		_.last(RECORDS.GUI.BTNS).back();
 	},
 	update: () => {
 		RECORDS.btn_choose();

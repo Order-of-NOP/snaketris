@@ -189,6 +189,9 @@ states['game'] = {
 						TXT_STL.LBL_MAGENTA
 					);
 					name_input = new InputField(x, 330);
+					if (GJAPI.bActive && GJAPI.sUserName) {
+						name_input.val = GJAPI.sUserName;
+					}
 				}
 				PAUSE.__Y0 = 400; // margin top for buttons
 				PAUSE.add_btn(()=>{

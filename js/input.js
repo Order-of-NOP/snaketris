@@ -20,9 +20,9 @@ class Input {
 	/** To be called on game create. Uses Phaser's game.input objects. */
 	constructor() {
 		let cursor = game.input.keyboard.createCursorKeys();
-		if (this.pads_supported) {
-			game.input.gamepad.start();
-		}
+		//if (this.pads_supported) {
+			//game.input.gamepad.start();
+		//}
 		/**
 		 * Action container for players. p[0] is for player one, p[1] - for
 		 * player 2, etc. Members contain hash-map with action names as keys

@@ -91,4 +91,11 @@ class InputField {
 		}
 		this._active = val;
 	}
+	set val(name) {
+		this.active = true;
+		this.value = name;
+		this.text.text = name;
+		this.caret.x = this.x + this.text.width;
+		this.active = false;
+	}
 }
