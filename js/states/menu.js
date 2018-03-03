@@ -16,6 +16,7 @@ states['menu'] = {
 		MENU.add_btn(()=>{ st('settings'); }, 'Settings',TXT_STL.BTN);
 		MENU.add_btn(()=>{ st('records'); }, 'High scores',TXT_STL.BTN);
 		_.each(MENU.GUI.BTNS, (e)=>{e.set_x(100);});
+		add_fullscreen();
 	},
 	update: () => {
 		MENU.btn_choose();

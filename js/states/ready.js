@@ -33,6 +33,7 @@ states['ready'] = {
 
 		READY.add_text(100, 240, READY_LBLS[1], TXT_STL.LBL_SCR);
 		READY.add_text(400, 240, READY_LBLS[1], TXT_STL.LBL_SCR);
+		add_fullscreen();
 	},
 	update: () => {
 		if (RDY_TIME == null) {

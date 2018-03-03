@@ -46,6 +46,17 @@ function spawn_tetr() {
 	return new Tetrimino(game.rnd.pick('litjlsoz'), [SIZE.W/2, 0]);
 }
 
+function add_fullscreen() {
+	game.input.onDown.add((ptr) => {
+		if (!ptr.rightButton.isDown) return;
+		if (game.scale.isFullScreen) {
+			game.scale.stopFullScreen();
+		} else {
+			game.scale.startFullScreen(false);
+		}
+	}, this);
+}
+
 states['game'] = {
 	init: () => {
 		bg_sprite = game.add.tileSprite(0, 0,
@@ -67,14 +78,7 @@ states['game'] = {
 		snake = new Snake(5, 2);
 		tetr = spawn_tetr();
 		//clk.start();
-		game.input.onDown.add((ptr) => {
-			if (!ptr.rightButton.isDown) return;
-			if (game.scale.isFullScreen) {
-				game.scale.stopFullScreen();
-			} else {
-				game.scale.startFullScreen(false);
-			}
-		}, this);
+		add_fullscreen();
 		snake_spawner = new SnakeSpawner(grid.g);
 		snake_spawner.spawn('left');
 		
