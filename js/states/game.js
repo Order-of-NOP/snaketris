@@ -127,6 +127,9 @@ states['game'] = {
 	},
 	// When you swith to another state
 	shutdown: () => {
+		if (CONFIG.MUSIC_ON) {
+			MUSIC.BACK.pause();
+		}
 		pause_btn_ind = 0;
 		LAST_GAME_STATE = 'game';
 		if (!PAUSE.TO_SETTINGS) {
@@ -143,9 +146,15 @@ states['game'] = {
 		}
 	},
 	paused: () => {
+		if (CONFIG.MUSIC_ON) {
+			MUSIC.BACK.pause();
+		}
 		if (LAST_GAME_STATE != 'game') {
 			game.paused = false;
 			LAST_GAME_STATE = 'game';
+			if (CONFIG.MUSIC_ON) {
+				MUSIC.BACK.play();
+			}
 			return;
 		}
 		// Init alpha screen
@@ -235,6 +244,9 @@ states['game'] = {
 		if (isDown && !PAUSE.LST_PRS2[2]) { PAUSE.call(); } F2(2);
 	},
 	resumed: () => {
+		if (CONFIG.MUSIC_ON) {
+			MUSIC.BACK.resume();
+		}
 		if (!PAUSE.TO_SETTINGS) {
 			clear_pause();
 		}
@@ -408,12 +420,18 @@ function draw_snake() {
 			// find fruit with this position and pop it
 			fruit_find(np[0][0], np[0][1]).destroy();
 			set_score(5);
+			if (!CONFIG.SOUND_MUTE) {
+				MUSIC.EAT.play();
+			}
 		}
 		if (n === 0 && ![MINO_TYPE.SNAKE, MINO_TYPE.FRUIT].includes(c)) {
 			// die, mah-fukker, die!
 			grid.set(snake.seg, MINO_TYPE.EMPTY);
 			snake_d = snake_d.concat(snake.seg);
 			//adding delay and spawn option
+			if(!CONFIG.SOUND_MUTE) {
+				MUSIC.DEAD.play();
+			}
 			if (!snake_spawner.spawn('left') && !snake_spawner.spawn('right')) {
 				snake_spawner.wait();
 			} 
@@ -522,6 +540,9 @@ function erase_lines() {
 			: 'lightning');
 	}
 	set_score(40*(lvl+1) + 20*(full.length - 1));
+	if (!CONFIG.SOUND_MUTE) {
+		MUSIC.ROW.play();
+	}
 	// more visuals
 	game.plugins.screenShake.shake(16);
 	for (let r = 0; r < grid.h; ++r)
