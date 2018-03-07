@@ -67,7 +67,12 @@ class InputField {
 		if (val) {
 			this.ph.visible = false;
 			this.caret.visible = true;
-			game.input.keyboard.clearCaptures();
+			//game.input.keyboard.clearCaptures();
+			// TODO remove this hardcode when input is bindable
+			game.input.keyboard.removeKeyCapture(Phaser.KeyCode.W);
+			game.input.keyboard.removeKeyCapture(Phaser.KeyCode.A);
+			game.input.keyboard.removeKeyCapture(Phaser.KeyCode.S);
+			game.input.keyboard.removeKeyCapture(Phaser.KeyCode.D);
 			game.input.keyboard.addCallbacks(this, (e) => {
 				if (e.keyCode === 8) {
 					this.value = _.initial(this.value).join('');
